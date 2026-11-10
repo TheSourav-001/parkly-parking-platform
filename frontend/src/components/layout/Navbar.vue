@@ -49,8 +49,12 @@ function toggleMobileMenu() {
       <!-- Right Controls: Theme Toggle & Actions -->
       <div class="nav-actions">
         <ThemeToggle />
-        <AppButton variant="ghost" size="sm" class="btn-signin">Sign In</AppButton>
-        <AppButton variant="primary" size="sm">Get Started</AppButton>
+        <router-link to="/login">
+          <AppButton variant="ghost" size="sm" class="btn-signin">Sign In</AppButton>
+        </router-link>
+        <router-link to="/register">
+          <AppButton variant="primary" size="sm">Get Started</AppButton>
+        </router-link>
 
         <!-- Mobile Menu Toggle Button -->
         <button
@@ -102,8 +106,12 @@ function toggleMobileMenu() {
       <a href="#locations" class="mobile-nav-link" @click="isMobileMenuOpen = false">Locations</a>
       <a href="#support" class="mobile-nav-link" @click="isMobileMenuOpen = false">Support</a>
       <div class="mobile-drawer-actions">
-        <AppButton variant="secondary" size="md" block @click="isMobileMenuOpen = false">Sign In</AppButton>
-        <AppButton variant="primary" size="md" block @click="isMobileMenuOpen = false">Get Started</AppButton>
+        <router-link to="/login" @click="isMobileMenuOpen = false">
+          <AppButton variant="secondary" size="md" block>Sign In</AppButton>
+        </router-link>
+        <router-link to="/register" @click="isMobileMenuOpen = false">
+          <AppButton variant="primary" size="md" block>Get Started</AppButton>
+        </router-link>
       </div>
     </div>
   </header>
