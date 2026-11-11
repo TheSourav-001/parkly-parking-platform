@@ -272,13 +272,13 @@ onBeforeUnmount(() => {
 
           <!-- Sun glow filter -->
           <filter id="sun-glow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="12" result="blur" />
+            <feGaussianBlur stdDeviation="16" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
 
-          <!-- Moon glow filter -->
+          <!-- Moon soft glow filter -->
           <filter id="moon-glow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="10" result="blur" />
+            <feGaussianBlur stdDeviation="14" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
 
@@ -319,38 +319,41 @@ onBeforeUnmount(() => {
         <g class="celestial-system">
           <!-- GLOWING SUN (Visible in Light Mode) -->
           <g class="celestial-sun" transform="translate(850, 80)">
-            <!-- Radiant outer sun aura -->
-            <circle cx="0" cy="0" r="56" fill="#FBBF24" opacity="0.22" filter="url(#sun-glow)" />
-            <circle cx="0" cy="0" r="40" fill="#FDE68A" opacity="0.42" filter="url(#sun-glow)" />
+            <!-- Radiant outer sun aura & ambient glow -->
+            <circle cx="0" cy="0" r="68" fill="#FBBF24" opacity="0.25" filter="url(#sun-glow)" />
+            <circle cx="0" cy="0" r="48" fill="#FDE68A" opacity="0.5" filter="url(#sun-glow)" />
             <!-- Radiating rotating sun rays -->
-            <g stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity="0.65" class="sun-rays">
-              <line x1="0" y1="-32" x2="0" y2="-43" />
-              <line x1="23" y1="-23" x2="31" y2="-31" />
-              <line x1="32" y1="0" x2="43" y2="0" />
-              <line x1="23" y1="23" x2="31" y2="31" />
-              <line x1="0" y1="32" x2="0" y2="43" />
-              <line x1="-23" y1="23" x2="-31" y2="31" />
-              <line x1="-32" y1="0" x2="-43" y2="0" />
-              <line x1="-23" y1="-23" x2="-31" y2="-31" />
+            <g stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" opacity="0.75" class="sun-rays">
+              <line x1="0" y1="-34" x2="0" y2="-46" />
+              <line x1="24" y1="-24" x2="33" y2="-33" />
+              <line x1="34" y1="0" x2="46" y2="0" />
+              <line x1="24" y1="24" x2="33" y2="33" />
+              <line x1="0" y1="34" x2="0" y2="46" />
+              <line x1="-24" y1="24" x2="-33" y2="33" />
+              <line x1="-34" y1="0" x2="-46" y2="0" />
+              <line x1="-24" y1="-24" x2="-33" y2="-33" />
             </g>
             <!-- Core glowing sun disc -->
-            <circle cx="0" cy="0" r="24" fill="url(#sun-core-gradient)" />
-            <circle cx="-5" cy="-5" r="18" fill="#FFFBEB" opacity="0.55" />
+            <circle cx="0" cy="0" r="26" fill="url(#sun-core-gradient)" />
+            <circle cx="-5" cy="-5" r="19" fill="#FFFBEB" opacity="0.6" />
           </g>
 
-          <!-- GLOWING MOON (Visible in Dark Mode) -->
+          <!-- GLOWING MOON (Visible in Dark Mode with gentle celestial glow) -->
           <g class="celestial-moon" transform="translate(850, 80)">
-            <!-- Atmospheric moonlight glow -->
-            <circle cx="0" cy="0" r="60" fill="#38BDF8" opacity="0.24" filter="url(#moon-glow)" />
-            <circle cx="0" cy="0" r="42" fill="#E0F2FE" opacity="0.4" filter="url(#moon-glow)" />
-            <!-- Luminous moon disc -->
-            <circle cx="0" cy="0" r="23" fill="url(#moon-core-gradient)" />
-            <!-- Soft lunar craters / details -->
-            <circle cx="-6" cy="-4" r="3.2" fill="#94A3B8" opacity="0.25" />
-            <circle cx="4" cy="6" r="4.6" fill="#94A3B8" opacity="0.2" />
-            <circle cx="7" cy="-7" r="2.6" fill="#94A3B8" opacity="0.22" />
+            <!-- Soft ambient moonlight aura -->
+            <circle cx="0" cy="0" r="64" fill="#38BDF8" opacity="0.22" filter="url(#moon-glow)" />
+            <circle cx="0" cy="0" r="44" fill="#BAE6FD" opacity="0.38" filter="url(#moon-glow)" />
+            <!-- Soft luminous moon disc -->
+            <circle cx="0" cy="0" r="24" fill="url(#moon-core-gradient)" />
+            <!-- Soft crescent shade giving realistic 3D lunar look -->
+            <path d="M -12,-20 A 24,24 0 0,0 16,18 A 21,21 0 0,1 -12,-20 Z" fill="#0284C7" opacity="0.12" />
+            <!-- Delicate lunar craters -->
+            <circle cx="-6" cy="-5" r="3.2" fill="#64748B" opacity="0.28" />
+            <circle cx="5" cy="6" r="4.8" fill="#64748B" opacity="0.22" />
+            <circle cx="8" cy="-7" r="2.8" fill="#64748B" opacity="0.25" />
+            <circle cx="-2" cy="11" r="2" fill="#64748B" opacity="0.18" />
             <!-- Moonlight rim highlight -->
-            <circle cx="-3" cy="-3" r="21" fill="none" stroke="#F0F9FF" stroke-width="1.2" opacity="0.75" />
+            <circle cx="-3" cy="-3" r="22" fill="none" stroke="#F0F9FF" stroke-width="1.4" opacity="0.8" />
           </g>
         </g>
 
@@ -1094,6 +1097,7 @@ onBeforeUnmount(() => {
   transform: scale(var(--hero-sun-scale, 1));
   transform-origin: 850px 80px;
   transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
 .celestial-moon {
@@ -1101,6 +1105,7 @@ onBeforeUnmount(() => {
   transform: scale(var(--hero-moon-scale, 0.85));
   transform-origin: 850px 80px;
   transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
 @keyframes sun-ray-spin {
