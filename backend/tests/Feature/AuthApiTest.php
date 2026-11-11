@@ -673,4 +673,49 @@ class AuthApiTest extends TestCase
         $meAgain->assertStatus(200)
             ->assertJsonPath('data.user.email', 'regression.flow@example.com');
     }
+
+    /**
+     * Test operator registration sets role=operator and is_active=false (pending verification).
+     */
+    public function test_operator_registration_creates_pending_unverified_account(): void
+    {
+        $payload = [
+            'name' => 'City Garage Operator',
+            'email' => 'operator.reg@example.com',
+            'phone' => '+1234567890',
+            'password' => 'SecurePass123!',
+            'password_confirmation' => 'SecurePass123!',
+            'role' => 'operator',
+        ];
+
+        $response = $this->postSpaJson('/api/v1/auth/register', $payload);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'status' => 'success',
+            ])
+            ->assertJsonPath('data.user.role', 'operator')
+            ->assertJsonPath('data.user.is_active', false);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'operator.reg@example.com',
+            'role' => 'operator',
+            'is_active' => 0,
+        ]);
+
+        // Inactive operator must not be automatically authenticated
+        $this->assertGuest('web');
+
+        // And attempting to log in immediately must return 403 inactive
+        $loginRes = $this->postSpaJson('/api/v1/auth/login', [
+            'email' => 'operator.reg@example.com',
+            'password' => 'SecurePass123!',
+        ]);
+
+        $loginRes->assertStatus(403)
+            ->assertJson([
+                'status' => 'error',
+                'message' => 'Your account is inactive. Please contact support.',
+            ]);
+    }
 }

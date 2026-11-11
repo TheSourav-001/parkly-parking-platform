@@ -3,10 +3,10 @@
  * Navbar Component — Mastercard-Inspired Floating Pill Navigation
  * Floating pill-shaped bar docked below the viewport top with rounded shoulders.
  * Uses Parkly's existing Navy + Teal tokens & light/dark theme switching.
- * Integrates Vue Router auth links and Pinia auth state (Login, Register, Logout).
+ * Integrates Vue Router auth links and Pinia auth state.
  */
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import AppButton from '../common/AppButton.vue'
 import { useAuthStore } from '../../stores/auth'
@@ -20,12 +20,24 @@ defineProps({
 
 const emit = defineEmits(['openSearch', 'navigate'])
 
+const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
-const isLoggingOut = ref(false)
+
+const userInitials = computed(() => {
+  const name = authStore.userName
+  if (!name) return 'U'
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+})
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -35,27 +47,35 @@ function closeMobileMenu() {
   isMobileMenuOpen.value = false
 }
 
+function handleSectionNav(sectionId) {
+  closeMobileMenu()
+  if (route.path === '/') {
+    const el = document.getElementById(sectionId)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
+    emit('navigate', sectionId)
+  } else {
+    router.push({ path: '/', hash: `#${sectionId}` })
+  }
+}
+
 function handleScroll() {
   isScrolled.value = window.scrollY > 20
 }
 
-async function handleLogout() {
-  isLoggingOut.value = true
-  try {
-    await authStore.logout()
-    router.push('/login')
-  } finally {
-    isLoggingOut.value = false
-    closeMobileMenu()
-  }
+function handleKeydown(e) {
+  if (e.key === 'Escape') closeMobileMenu()
 }
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
+  document.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
@@ -82,15 +102,15 @@ onUnmounted(() => {
 
       <!-- Desktop Links: Airy pill spacing -->
       <nav class="nav-links" aria-label="Main Navigation">
-        <a href="#discovery" class="nav-link">Find Parking</a>
-        <a href="#how-it-works" class="nav-link">How It Works</a>
-        <a href="#locations" class="nav-link">Locations</a>
-        <a href="#featured" class="nav-link">Featured</a>
-        <a href="#operators" class="nav-link">For Operators</a>
-        <a href="#support" class="nav-link">Support</a>
+        <a href="/#discovery" class="nav-link" @click.prevent="handleSectionNav('discovery')">Find Parking</a>
+        <a href="/#how-it-works" class="nav-link" @click.prevent="handleSectionNav('how-it-works')">How It Works</a>
+        <a href="/#locations" class="nav-link" @click.prevent="handleSectionNav('locations')">Locations</a>
+        <a href="/#featured" class="nav-link" @click.prevent="handleSectionNav('featured')">Featured</a>
+        <a href="/#operators" class="nav-link" @click.prevent="handleSectionNav('operators')">For Operators</a>
+        <a href="/#support" class="nav-link" @click.prevent="handleSectionNav('support')">Support</a>
       </nav>
 
-      <!-- Right Actions: Search Circle + Theme Toggle + Sign In / User Profile + Get Started -->
+      <!-- Right Actions: Search Circle + Theme Toggle + Sign In / User Profile Dropdown -->
       <div class="nav-actions">
         <!-- Circular Search Trigger -->
         <button
@@ -135,22 +155,26 @@ onUnmounted(() => {
           </router-link>
         </template>
 
-        <!-- Authenticated User Profile & Logout -->
+        <!-- Authenticated User Profile -->
         <template v-else>
-          <div class="user-badge" :title="authStore.userEmail">
-            <span class="user-name">{{ authStore.userName }}</span>
-            <span class="user-role">{{ authStore.userRole }}</span>
+          <div class="profile-avatar-wrapper">
+            <router-link
+              to="/profile"
+              class="user-profile-trigger"
+              :title="`${authStore.userName} — Open Profile`"
+              :aria-label="`Open ${authStore.userName} profile`"
+            >
+              <div class="user-avatar-pill">
+                <img
+                  v-if="authStore.userAvatar"
+                  :src="authStore.userAvatar"
+                  :alt="authStore.userName"
+                  class="avatar-img"
+                />
+                <span v-else class="avatar-fallback">{{ userInitials }}</span>
+              </div>
+            </router-link>
           </div>
-          <AppButton
-            variant="ghost"
-            size="sm"
-            pill
-            class="btn-logout"
-            :loading="isLoggingOut"
-            @click="handleLogout"
-          >
-            Logout
-          </AppButton>
         </template>
 
         <!-- Mobile Hamburger Button -->
@@ -208,12 +232,12 @@ onUnmounted(() => {
             <button class="mobile-drawer-close" aria-label="Close menu" @click="closeMobileMenu">&times;</button>
           </div>
           <div class="mobile-drawer-links">
-            <a href="#discovery" class="mobile-link" @click="closeMobileMenu">Find Parking</a>
-            <a href="#how-it-works" class="mobile-link" @click="closeMobileMenu">How It Works</a>
-            <a href="#locations" class="mobile-link" @click="closeMobileMenu">Popular Locations</a>
-            <a href="#featured" class="mobile-link" @click="closeMobileMenu">Featured Facilities</a>
-            <a href="#operators" class="mobile-link" @click="closeMobileMenu">For Operators</a>
-            <a href="#support" class="mobile-link" @click="closeMobileMenu">Support</a>
+            <a href="/#discovery" class="mobile-link" @click.prevent="handleSectionNav('discovery')">Find Parking</a>
+            <a href="/#how-it-works" class="mobile-link" @click.prevent="handleSectionNav('how-it-works')">How It Works</a>
+            <a href="/#locations" class="mobile-link" @click.prevent="handleSectionNav('locations')">Popular Locations</a>
+            <a href="/#featured" class="mobile-link" @click.prevent="handleSectionNav('featured')">Featured Facilities</a>
+            <a href="/#operators" class="mobile-link" @click.prevent="handleSectionNav('operators')">For Operators</a>
+            <a href="/#support" class="mobile-link" @click.prevent="handleSectionNav('support')">Support</a>
           </div>
           <div class="mobile-drawer-footer">
             <template v-if="!authStore.isAuthenticated">
@@ -226,19 +250,25 @@ onUnmounted(() => {
             </template>
             <template v-else>
               <div class="mobile-user-info">
-                <div class="user-name">{{ authStore.userName }}</div>
-                <div class="user-email">{{ authStore.userEmail }}</div>
+                <div class="mobile-user-row">
+                  <div class="user-avatar-pill small">
+                    <img
+                      v-if="authStore.userAvatar"
+                      :src="authStore.userAvatar"
+                      :alt="authStore.userName"
+                      class="avatar-img"
+                    />
+                    <span v-else class="avatar-fallback">{{ userInitials }}</span>
+                  </div>
+                  <div>
+                    <div class="user-name">{{ authStore.userName }}</div>
+                    <div class="user-email">{{ authStore.userEmail }}</div>
+                  </div>
+                </div>
               </div>
-              <AppButton
-                variant="secondary"
-                size="md"
-                pill
-                block
-                :loading="isLoggingOut"
-                @click="handleLogout"
-              >
-                Logout
-              </AppButton>
+              <router-link to="/profile" @click="closeMobileMenu">
+                <AppButton variant="secondary" size="md" pill block>My Profile</AppButton>
+              </router-link>
             </template>
           </div>
         </div>
@@ -437,37 +467,95 @@ onUnmounted(() => {
   height: 36px !important;
 }
 
-.user-badge {
+/* ============================================================
+   AUTHENTICATED PROFILE AVATAR LINK
+   ============================================================ */
+.profile-avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.user-profile-trigger {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-right: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 2px;
+  border-radius: var(--radius-pill, 999px);
+  cursor: pointer;
+  color: var(--color-text);
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+  outline: none;
+}
+
+.user-profile-trigger:hover {
+  background-color: var(--color-surface-subtle);
+  border-color: var(--color-border);
+  transform: scale(1.04);
+}
+
+.user-profile-trigger:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+}
+
+.user-avatar-pill {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #1e293b);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2);
+}
+
+.user-avatar-pill.small {
+  width: 36px;
+  height: 36px;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .user-name {
-  font-size: var(--font-size-sm);
+  font-size: 13px;
   font-weight: var(--font-weight-medium);
   color: var(--color-text);
-  max-width: 140px;
+  max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.2;
 }
 
-.user-role {
-  font-size: 10px;
-  text-transform: uppercase;
-  color: var(--color-primary);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: 0.05em;
-}
-
+/* Mobile Drawer Info */
 .mobile-user-info {
   margin-bottom: var(--space-3);
   padding: var(--space-3);
   background-color: var(--color-bg);
   border-radius: var(--radius-md);
   text-align: left;
+}
+
+.mobile-user-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .mobile-user-info .user-name {
@@ -620,8 +708,7 @@ onUnmounted(() => {
   }
 
   .nav-signin-link,
-  .btn-get-started,
-  .user-badge {
+  .btn-get-started {
     display: none;
   }
 

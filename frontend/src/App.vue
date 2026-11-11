@@ -1,39 +1,40 @@
 <script setup>
 /**
  * Main Application Shell for Parkly Frontend
- * Dynamically renders the compact AuthNavbar on authentication routes (/login, /register, etc.)
- * while rendering the floating pill Navbar, HomePage, and dark editorial Footer on standard routes.
+ * Renders the unified floating pill Navbar on all routes (home, auth, profile)
+ * and renders the dark editorial Footer on standard routes.
  */
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Navbar from './components/layout/Navbar.vue'
-import AuthNavbar from './components/layout/AuthNavbar.vue'
 import Footer from './components/layout/Footer.vue'
 
 const route = useRoute()
+const router = useRouter()
 const isAuthRoute = computed(() => Boolean(route.meta && route.meta.isAuth))
 
-function handleOpenSearch() {
-  const el = document.getElementById('discovery')
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth' })
-  }
-}
-
-function handleNavigate(targetId) {
+function scrollOrNavigate(targetId) {
   const el = document.getElementById(targetId)
   if (el) {
     el.scrollIntoView({ behavior: 'smooth' })
+  } else {
+    router.push({ path: '/', hash: `#${targetId}` })
   }
+}
+
+function handleOpenSearch() {
+  scrollOrNavigate('discovery')
+}
+
+function handleNavigate(targetId) {
+  scrollOrNavigate(targetId)
 }
 </script>
 
 <template>
   <div class="parkly-app" :class="{ 'is-auth-view': isAuthRoute }">
-    <!-- Render AuthNavbar on auth pages, standard floating Navbar elsewhere -->
-    <AuthNavbar v-if="isAuthRoute" />
+    <!-- Unified Home-Style Floating Pill Navbar across all pages -->
     <Navbar
-      v-else
       @openSearch="handleOpenSearch"
       @navigate="handleNavigate"
     />
