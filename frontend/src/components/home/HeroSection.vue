@@ -31,12 +31,12 @@ const updateViewBox = () => {
   if (typeof window === 'undefined') return
   const w = window.innerWidth
   if (w <= 640) {
-    // Mobile: Frame entrance gate + target stalls P-04..P-07 + aisle
-    currentViewBox.value = '265 215 675 255'
+    // Mobile: Frame sky (Sun/Moon), entrance gate + target stalls P-04..P-07 + aisle
+    currentViewBox.value = '265 40 675 430'
     currentPreserveAspect.value = 'xMidYMid meet'
   } else if (w <= 900) {
-    // Tablet: Frame entire facility from entrance gate to P-08
-    currentViewBox.value = '255 195 780 275'
+    // Tablet: Frame sky, entire facility from gate to P-08
+    currentViewBox.value = '255 40 780 430'
     currentPreserveAspect.value = 'xMidYMid meet'
   } else {
     // Desktop & Windows: Full panoramic view anchored to right
@@ -254,6 +254,34 @@ onBeforeUnmount(() => {
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
 
+          <!-- Sun core gradient -->
+          <radialGradient id="sun-core-gradient" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#FFFBEB" />
+            <stop offset="35%" stop-color="#FEF08A" />
+            <stop offset="75%" stop-color="#FBBF24" />
+            <stop offset="100%" stop-color="#F59E0B" />
+          </radialGradient>
+
+          <!-- Moon core gradient -->
+          <radialGradient id="moon-core-gradient" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <stop offset="40%" stop-color="#F0F9FF" />
+            <stop offset="80%" stop-color="#BAE6FD" />
+            <stop offset="100%" stop-color="#7DD3FC" />
+          </radialGradient>
+
+          <!-- Sun glow filter -->
+          <filter id="sun-glow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="12" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+
+          <!-- Moon glow filter -->
+          <filter id="moon-glow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="10" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+
           <!-- Soft lamp glow filter (night mode) -->
           <filter id="lamp-glow" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation="6" result="blur" />
@@ -287,11 +315,50 @@ onBeforeUnmount(() => {
           <circle cx="620" cy="12" r="0.8" fill="white" opacity="0.5" />
         </g>
 
+        <!-- ======== CELESTIAL SYSTEM: GLOWING SUN (Day) & GLOWING MOON (Night) ======== -->
+        <g class="celestial-system">
+          <!-- GLOWING SUN (Visible in Light Mode) -->
+          <g class="celestial-sun" transform="translate(850, 80)">
+            <!-- Radiant outer sun aura -->
+            <circle cx="0" cy="0" r="56" fill="#FBBF24" opacity="0.22" filter="url(#sun-glow)" />
+            <circle cx="0" cy="0" r="40" fill="#FDE68A" opacity="0.42" filter="url(#sun-glow)" />
+            <!-- Radiating rotating sun rays -->
+            <g stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity="0.65" class="sun-rays">
+              <line x1="0" y1="-32" x2="0" y2="-43" />
+              <line x1="23" y1="-23" x2="31" y2="-31" />
+              <line x1="32" y1="0" x2="43" y2="0" />
+              <line x1="23" y1="23" x2="31" y2="31" />
+              <line x1="0" y1="32" x2="0" y2="43" />
+              <line x1="-23" y1="23" x2="-31" y2="31" />
+              <line x1="-32" y1="0" x2="-43" y2="0" />
+              <line x1="-23" y1="-23" x2="-31" y2="-31" />
+            </g>
+            <!-- Core glowing sun disc -->
+            <circle cx="0" cy="0" r="24" fill="url(#sun-core-gradient)" />
+            <circle cx="-5" cy="-5" r="18" fill="#FFFBEB" opacity="0.55" />
+          </g>
+
+          <!-- GLOWING MOON (Visible in Dark Mode) -->
+          <g class="celestial-moon" transform="translate(850, 80)">
+            <!-- Atmospheric moonlight glow -->
+            <circle cx="0" cy="0" r="60" fill="#38BDF8" opacity="0.24" filter="url(#moon-glow)" />
+            <circle cx="0" cy="0" r="42" fill="#E0F2FE" opacity="0.4" filter="url(#moon-glow)" />
+            <!-- Luminous moon disc -->
+            <circle cx="0" cy="0" r="23" fill="url(#moon-core-gradient)" />
+            <!-- Soft lunar craters / details -->
+            <circle cx="-6" cy="-4" r="3.2" fill="#94A3B8" opacity="0.25" />
+            <circle cx="4" cy="6" r="4.6" fill="#94A3B8" opacity="0.2" />
+            <circle cx="7" cy="-7" r="2.6" fill="#94A3B8" opacity="0.22" />
+            <!-- Moonlight rim highlight -->
+            <circle cx="-3" cy="-3" r="21" fill="none" stroke="#F0F9FF" stroke-width="1.2" opacity="0.75" />
+          </g>
+        </g>
+
         <!-- ======== BACKGROUND BUILDINGS (Far skyline) ======== -->
         <g class="skyline-buildings">
           <!-- Building 1 — Tall residential tower (far left) -->
           <rect x="60" y="110" width="65" height="170" rx="3" fill="var(--hero-building-far)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
             <rect x="70" y="120" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="84" y="120" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="100" y="120" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
@@ -309,7 +376,7 @@ onBeforeUnmount(() => {
 
           <!-- Building 2 — Mid-height office (left-center) -->
           <rect x="145" y="160" width="55" height="120" rx="3" fill="var(--hero-building-mid)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
             <rect x="153" y="170" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="165" y="170" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="179" y="170" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
@@ -325,7 +392,7 @@ onBeforeUnmount(() => {
 
           <!-- Building 3 — Commercial block (far right) -->
           <rect x="1020" y="130" width="70" height="150" rx="3" fill="var(--hero-building-far)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
             <rect x="1030" y="140" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1045" y="140" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1060" y="140" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
@@ -343,7 +410,7 @@ onBeforeUnmount(() => {
 
           <!-- Building 4 — Apartment (right-center) -->
           <rect x="1110" y="170" width="50" height="110" rx="3" fill="var(--hero-building-mid)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
             <rect x="1118" y="180" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1132" y="180" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1146" y="180" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
@@ -357,29 +424,53 @@ onBeforeUnmount(() => {
 
         <!-- ======== TREES (between buildings and parking) ======== -->
         <g class="landscape-trees">
-          <!-- Tree cluster left -->
-          <circle cx="50" cy="260" r="18" fill="var(--hero-tree-fill)" />
-          <circle cx="38" cy="268" r="14" fill="var(--hero-tree-fill-dark)" />
-          <rect x="46" y="274" width="8" height="14" rx="2" fill="var(--hero-trunk)" />
+          <!-- Tree cluster left (Enlarged) -->
+          <circle cx="50" cy="250" r="26" fill="var(--hero-tree-fill)" />
+          <circle cx="32" cy="262" r="20" fill="var(--hero-tree-fill-dark)" />
+          <rect x="45" y="268" width="9" height="20" rx="2" fill="var(--hero-trunk)" />
 
-          <circle cx="135" cy="265" r="15" fill="var(--hero-tree-fill)" />
-          <circle cx="128" cy="272" r="12" fill="var(--hero-tree-fill-dark)" />
-          <rect x="131" y="276" width="7" height="12" rx="2" fill="var(--hero-trunk)" />
+          <circle cx="138" cy="254" r="23" fill="var(--hero-tree-fill)" />
+          <circle cx="124" cy="264" r="17" fill="var(--hero-tree-fill-dark)" />
+          <rect x="133" y="270" width="8" height="18" rx="2" fill="var(--hero-trunk)" />
 
-          <!-- Tree cluster right -->
-          <circle cx="1000" cy="258" r="17" fill="var(--hero-tree-fill)" />
-          <circle cx="1012" cy="266" r="13" fill="var(--hero-tree-fill-dark)" />
-          <rect x="996" y="272" width="8" height="14" rx="2" fill="var(--hero-trunk)" />
+          <!-- Tree cluster right (Enlarged) -->
+          <circle cx="1000" cy="248" r="25" fill="var(--hero-tree-fill)" />
+          <circle cx="1018" cy="258" r="19" fill="var(--hero-tree-fill-dark)" />
+          <rect x="995" y="266" width="9" height="22" rx="2" fill="var(--hero-trunk)" />
 
-          <circle cx="1100" cy="262" r="14" fill="var(--hero-tree-fill)" />
-          <circle cx="1092" cy="268" r="11" fill="var(--hero-tree-fill-dark)" />
-          <rect x="1096" y="274" width="7" height="12" rx="2" fill="var(--hero-trunk)" />
+          <circle cx="1106" cy="252" r="23" fill="var(--hero-tree-fill)" />
+          <circle cx="1092" cy="262" r="17" fill="var(--hero-tree-fill-dark)" />
+          <rect x="1101" y="268" width="8" height="20" rx="2" fill="var(--hero-trunk)" />
+
+          <!-- 3 NEW ROADSIDE TREES (Along the street & curb) -->
+          <!-- Roadside Tree 1 (Left avenue tree near gate) -->
+          <g class="roadside-tree roadside-tree-1">
+            <ellipse cx="208" cy="286" rx="14" ry="4" fill="var(--hero-curb)" opacity="0.6" />
+            <rect x="204" y="268" width="7" height="18" rx="2" fill="var(--hero-trunk)" />
+            <circle cx="208" cy="250" r="20" fill="var(--hero-tree-fill)" />
+            <circle cx="198" cy="258" r="15" fill="var(--hero-tree-fill-dark)" />
+          </g>
+
+          <!-- Roadside Tree 2 (Mid-driveway avenue tree) -->
+          <g class="roadside-tree roadside-tree-2">
+            <ellipse cx="325" cy="286" rx="14" ry="4" fill="var(--hero-curb)" opacity="0.6" />
+            <rect x="321" y="268" width="7" height="18" rx="2" fill="var(--hero-trunk)" />
+            <circle cx="325" cy="250" r="20" fill="var(--hero-tree-fill)" />
+            <circle cx="334" cy="258" r="15" fill="var(--hero-tree-fill-dark)" />
+          </g>
+
+          <!-- Roadside Tree 3 (Right avenue tree near exit) -->
+          <g class="roadside-tree roadside-tree-3">
+            <ellipse cx="955" cy="286" rx="14" ry="4" fill="var(--hero-curb)" opacity="0.6" />
+            <rect x="951" y="268" width="7" height="18" rx="2" fill="var(--hero-trunk)" />
+            <circle cx="955" cy="250" r="21" fill="var(--hero-tree-fill)" />
+            <circle cx="964" cy="258" r="15" fill="var(--hero-tree-fill-dark)" />
+          </g>
 
           <!-- Small bushes -->
-          <ellipse cx="240" cy="278" rx="12" ry="8" fill="var(--hero-tree-fill-dark)" opacity="0.7" />
-          <ellipse cx="960" cy="276" rx="14" ry="9" fill="var(--hero-tree-fill-dark)" opacity="0.7" />
+          <ellipse cx="240" cy="278" rx="14" ry="9" fill="var(--hero-tree-fill-dark)" opacity="0.75" />
+          <ellipse cx="925" cy="278" rx="15" ry="9" fill="var(--hero-tree-fill-dark)" opacity="0.75" />
         </g>
-
         <!-- ======== GROUND / ROAD SURFACE ======== -->
         <rect x="0" y="280" width="1200" height="200" fill="url(#ground-gradient)" />
 
@@ -815,6 +906,10 @@ onBeforeUnmount(() => {
   --hero-sky-bottom: #D4E8F5;
   --hero-cloud-opacity: 1;
   --hero-star-opacity: 0;
+  --hero-sun-opacity: 1;
+  --hero-sun-scale: 1;
+  --hero-moon-opacity: 0;
+  --hero-moon-scale: 0.85;
 
   --hero-ground-top: #D1D5DB;
   --hero-ground-bottom: #C8CCD2;
@@ -826,8 +921,9 @@ onBeforeUnmount(() => {
   --hero-building-far: #CBD5E1;
   --hero-building-mid: #D6DDE6;
   --hero-building-stroke: #B0B9C5;
-  --hero-window-glow: transparent;
-  --hero-window-light-opacity: 0;
+  --hero-window-glow: #BAE6FD;
+  --hero-window-stroke: #38BDF8;
+  --hero-window-light-opacity: 0.95;
 
   --hero-tree-fill: #4ADE80;
   --hero-tree-fill-dark: #22C55E;
@@ -869,6 +965,10 @@ onBeforeUnmount(() => {
   --hero-sky-bottom: #101B2C;
   --hero-cloud-opacity: 0;
   --hero-star-opacity: 1;
+  --hero-sun-opacity: 0;
+  --hero-sun-scale: 0.85;
+  --hero-moon-opacity: 1;
+  --hero-moon-scale: 1;
 
   --hero-ground-top: #111C2E;
   --hero-ground-bottom: #0D1726;
@@ -881,6 +981,7 @@ onBeforeUnmount(() => {
   --hero-building-mid: #1A293F;
   --hero-building-stroke: #26364C;
   --hero-window-glow: #FDE68A;
+  --hero-window-stroke: #F59E0B;
   --hero-window-light-opacity: 0.85;
 
   --hero-tree-fill: #166534;
@@ -917,6 +1018,10 @@ onBeforeUnmount(() => {
     --hero-sky-bottom: #101B2C;
     --hero-cloud-opacity: 0;
     --hero-star-opacity: 1;
+    --hero-sun-opacity: 0;
+    --hero-sun-scale: 0.85;
+    --hero-moon-opacity: 1;
+    --hero-moon-scale: 1;
 
     --hero-ground-top: #111C2E;
     --hero-ground-bottom: #0D1726;
@@ -929,6 +1034,7 @@ onBeforeUnmount(() => {
     --hero-building-mid: #1A293F;
     --hero-building-stroke: #26364C;
     --hero-window-glow: #FDE68A;
+    --hero-window-stroke: #F59E0B;
     --hero-window-light-opacity: 0.85;
 
     --hero-tree-fill: #166534;
@@ -982,6 +1088,31 @@ onBeforeUnmount(() => {
 }
 
 /* Transition theme-aware SVG properties smoothly */
+/* Celestial system transitions & sun ray rotation */
+.celestial-sun {
+  opacity: var(--hero-sun-opacity, 1);
+  transform: scale(var(--hero-sun-scale, 1));
+  transform-origin: 850px 80px;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.celestial-moon {
+  opacity: var(--hero-moon-opacity, 0);
+  transform: scale(var(--hero-moon-scale, 0.85));
+  transform-origin: 850px 80px;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes sun-ray-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sun-rays {
+  transform-origin: 0 0;
+  animation: sun-ray-spin 48s linear infinite;
+}
+
 .parking-canvas-svg rect,
 .parking-canvas-svg circle,
 .parking-canvas-svg line,
@@ -1210,7 +1341,7 @@ onBeforeUnmount(() => {
     width: calc(100% - 32px);
     max-width: 720px;
     margin: 8px auto 36px;
-    aspect-ratio: 675 / 255;
+    aspect-ratio: 675 / 380;
     height: auto;
     border-radius: 18px;
     border: 1px solid var(--color-border);
@@ -1236,7 +1367,7 @@ onBeforeUnmount(() => {
     width: calc(100% - 24px);
     margin: 6px auto 28px;
     border-radius: 14px;
-    aspect-ratio: 675 / 255;
+    aspect-ratio: 675 / 380;
   }
 
   .hero-ctas {
