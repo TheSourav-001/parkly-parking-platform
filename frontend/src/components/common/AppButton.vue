@@ -3,9 +3,10 @@
  * AppButton Component
  * Reusable button for Parkly Design System.
  *
- * @prop {string} variant - 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+ * @prop {string} variant - 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'pill'
  * @prop {string} size - 'sm' | 'md' | 'lg'
  * @prop {string} type - 'button' | 'submit' | 'reset'
+ * @prop {boolean} pill - Force full pill shape (999px border-radius)
  * @prop {boolean} disabled - Whether the button is disabled
  * @prop {boolean} loading - Display loading state
  * @prop {boolean} block - Full width button
@@ -14,7 +15,7 @@ defineProps({
   variant: {
     type: String,
     default: 'primary',
-    validator: (v) => ['primary', 'secondary', 'outline', 'ghost', 'danger'].includes(v),
+    validator: (v) => ['primary', 'secondary', 'outline', 'ghost', 'danger', 'pill'].includes(v),
   },
   size: {
     type: String,
@@ -24,6 +25,10 @@ defineProps({
   type: {
     type: String,
     default: 'button',
+  },
+  pill: {
+    type: Boolean,
+    default: false,
   },
   disabled: {
     type: Boolean,
@@ -49,7 +54,7 @@ defineEmits(['click'])
     :class="[
       `variant-${variant}`,
       `size-${size}`,
-      { 'is-loading': loading, 'is-block': block }
+      { 'is-loading': loading, 'is-block': block, 'is-pill': pill }
     ]"
     :disabled="disabled || loading"
     :aria-busy="loading"
@@ -74,11 +79,12 @@ defineEmits(['click'])
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-2xl, 20px);
   font-family: var(--font-sans);
-  font-weight: var(--font-weight-medium);
+  font-weight: 500;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
@@ -90,8 +96,12 @@ defineEmits(['click'])
   text-decoration: none;
 }
 
+.parkly-button.is-pill {
+  border-radius: var(--radius-pill, 999px) !important;
+}
+
 .parkly-button:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: scale(0.98);
 }
 
 .parkly-button.is-block {
@@ -171,6 +181,17 @@ defineEmits(['click'])
 }
 .variant-danger:hover:not(:disabled) {
   filter: brightness(0.9);
+}
+
+.variant-pill {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-pill, 999px);
+}
+.variant-pill:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* --- Spinner --- */
