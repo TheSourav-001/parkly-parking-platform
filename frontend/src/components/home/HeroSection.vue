@@ -15,7 +15,7 @@
  * 6. Pauses for ~2 seconds.
  * 7. Smoothly resets and restarts.
  */
-import { onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { animate, createTimeline, svg } from 'animejs'
 import AppButton from '../common/AppButton.vue'
 
@@ -24,7 +24,31 @@ defineEmits(['explore', 'howItWorks'])
 let activeTimeline = null
 let activeAnimations = []
 
+const currentViewBox = ref('0 0 1200 480')
+const currentPreserveAspect = ref('xMaxYMid slice')
+
+const updateViewBox = () => {
+  if (typeof window === 'undefined') return
+  const w = window.innerWidth
+  if (w <= 640) {
+    // Mobile: Frame entrance gate + target stalls P-04..P-07 + aisle
+    currentViewBox.value = '265 215 675 255'
+    currentPreserveAspect.value = 'xMidYMid meet'
+  } else if (w <= 900) {
+    // Tablet: Frame entire facility from entrance gate to P-08
+    currentViewBox.value = '255 195 780 275'
+    currentPreserveAspect.value = 'xMidYMid meet'
+  } else {
+    // Desktop & Windows: Full panoramic view anchored to right
+    currentViewBox.value = '0 0 1200 480'
+    currentPreserveAspect.value = 'xMaxYMid slice'
+  }
+}
+
 onMounted(() => {
+  updateViewBox()
+  window.addEventListener('resize', updateViewBox, { passive: true })
+
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   if (prefersReduced) {
@@ -159,6 +183,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateViewBox)
+
   if (activeTimeline) {
     try {
       if (typeof activeTimeline.pause === 'function') activeTimeline.pause()
@@ -189,11 +215,11 @@ onBeforeUnmount(() => {
          ===================================================================== -->
     <div class="hero-parking-canvas" aria-hidden="true">
       <svg
-        viewBox="0 0 1200 480"
+        :viewBox="currentViewBox"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         class="parking-canvas-svg"
-        preserveAspectRatio="xMidYMid slice"
+        :preserveAspectRatio="currentPreserveAspect"
       >
         <defs>
           <!-- Sky gradient — uses CSS custom properties for theme awareness -->
@@ -830,7 +856,8 @@ onBeforeUnmount(() => {
 
   position: relative;
   width: 100%;
-  min-height: 520px;
+  min-height: 500px;
+  max-height: 580px;
   overflow: hidden;
   background-color: var(--color-bg);
 }
@@ -974,14 +1001,13 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 0;
   left: 0;
-  width: 55%;
+  width: 46%;
   height: 100%;
   background: linear-gradient(
     90deg,
     var(--color-bg) 0%,
-    var(--color-bg) 30%,
-    rgba(248, 250, 252, 0.85) 55%,
-    rgba(248, 250, 252, 0.4) 75%,
+    var(--color-bg) 35%,
+    rgba(248, 250, 252, 0.75) 65%,
     transparent 100%
   );
   pointer-events: none;
@@ -993,9 +1019,8 @@ onBeforeUnmount(() => {
   background: linear-gradient(
     90deg,
     var(--color-bg) 0%,
-    var(--color-bg) 30%,
-    rgba(11, 18, 32, 0.85) 55%,
-    rgba(11, 18, 32, 0.4) 75%,
+    var(--color-bg) 35%,
+    rgba(11, 18, 32, 0.75) 65%,
     transparent 100%
   );
 }
@@ -1005,9 +1030,8 @@ onBeforeUnmount(() => {
     background: linear-gradient(
       90deg,
       var(--color-bg) 0%,
-      var(--color-bg) 30%,
-      rgba(11, 18, 32, 0.85) 55%,
-      rgba(11, 18, 32, 0.4) 75%,
+      var(--color-bg) 35%,
+      rgba(11, 18, 32, 0.75) 65%,
       transparent 100%
     );
   }
@@ -1019,7 +1043,7 @@ onBeforeUnmount(() => {
 .hero-overlay-content {
   position: relative;
   z-index: 3;
-  padding: 56px 24px 100px;
+  padding: clamp(36px, 4vw, 52px) 24px clamp(44px, 5vw, 64px);
 }
 
 .hero-container {
@@ -1030,8 +1054,8 @@ onBeforeUnmount(() => {
 .hero-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 520px;
+  gap: 16px;
+  max-width: 480px;
 }
 
 .hero-eyebrow {
@@ -1053,29 +1077,29 @@ onBeforeUnmount(() => {
 }
 
 .hero-headline {
-  font-size: clamp(2.4rem, 4.5vw, 3.85rem);
-  font-weight: 500;
-  line-height: 1.08;
+  font-size: clamp(2.1rem, 3.5vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.12;
   letter-spacing: -0.03em;
   color: var(--color-text);
   margin: 0;
 }
 
 .hero-description {
-  font-size: clamp(1rem, 1.3vw, 1.18rem);
-  font-weight: 450;
-  line-height: 1.55;
+  font-size: clamp(0.925rem, 1.15vw, 1.1rem);
+  font-weight: 400;
+  line-height: 1.5;
   color: var(--color-text-muted);
-  max-width: 480px;
+  max-width: 460px;
   margin: 0;
 }
 
 .hero-ctas {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .cta-primary {
@@ -1095,8 +1119,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-top: 10px;
-  padding-top: 20px;
+  margin-top: 6px;
+  padding-top: 18px;
   border-top: 1px solid var(--color-border);
 }
 
@@ -1125,160 +1149,6 @@ onBeforeUnmount(() => {
   background-color: var(--color-border);
 }
 
-/* ============================================================
-   BOTTOM FLOATING ELEMENTS — Pass + Card + Arrow
-   ============================================================ */
-.hero-bottom-elements {
-  position: absolute;
-  bottom: 20px;
-  left: 24px;
-  right: 24px;
-  z-index: 4;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
-  pointer-events: none;
-}
-
-.hero-bottom-elements > * {
-  pointer-events: auto;
-}
-
-/* Digital Pass (lower-left) */
-.hero-pass-float {
-  flex-shrink: 0;
-}
-
-.pass-circle {
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid var(--color-surface);
-  box-shadow: var(--shadow-halo);
-  transition: transform var(--transition-smooth);
-}
-
-.pass-circle:hover {
-  transform: translateY(-3px);
-}
-
-.pass-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* Card group (card + arrow) */
-.hero-card-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.floating-availability-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-pill, 999px);
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: var(--shadow-card-elevated);
-  backdrop-filter: blur(8px);
-}
-
-.card-pulse-indicator {
-  position: relative;
-  width: 9px;
-  height: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: var(--color-success);
-}
-
-.live-ping {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: var(--color-success);
-  opacity: 0.5;
-  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
-.card-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.card-title {
-  font-size: 0.78125rem;
-  font-weight: 600;
-  color: var(--color-text);
-  line-height: 1.2;
-}
-
-.card-detail {
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
-}
-
-.card-badge {
-  font-size: 0.625rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: var(--radius-pill, 999px);
-  background-color: rgba(22, 163, 74, 0.12);
-  color: var(--color-success);
-  letter-spacing: 0.05em;
-}
-
-/* Circular Arrow CTA */
-.satellite-cta {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: var(--color-surface);
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-elevation);
-  cursor: pointer;
-  text-decoration: none;
-  flex-shrink: 0;
-  transition:
-    transform var(--transition-fast),
-    background-color var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.satellite-cta:hover {
-  transform: scale(1.08) rotate(-6deg);
-  background-color: var(--color-primary);
-  color: var(--color-primary-contrast);
-  text-decoration: none;
-}
-
 /* Animation targets */
 .car {
   transform-origin: 0 0;
@@ -1298,44 +1168,32 @@ onBeforeUnmount(() => {
 }
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE — TABLET & MOBILE
    ============================================================ */
-@media (max-width: 1024px) {
-  .hero-overlay-content {
-    padding: 48px 24px 120px;
-  }
-
-  .hero-content {
-    max-width: 440px;
-  }
-
-  .hero-canvas-overlay {
-    width: 60%;
-  }
-
-  .hero-bottom-elements {
-    bottom: 16px;
-  }
-
-  .pass-circle {
-    width: 110px;
-    height: 110px;
-  }
-}
-
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .hero-section {
-    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
   }
 
   .hero-overlay-content {
-    padding: 36px 16px 160px;
+    order: 1;
+    position: relative;
+    padding: 32px 20px 20px;
+    z-index: 2;
   }
 
   .hero-content {
     max-width: 100%;
     text-align: center;
     align-items: center;
+  }
+
+  .hero-description {
+    max-width: 540px;
   }
 
   .hero-ctas {
@@ -1346,74 +1204,67 @@ onBeforeUnmount(() => {
     justify-content: center;
   }
 
+  .hero-parking-canvas {
+    order: 2;
+    position: relative;
+    width: calc(100% - 32px);
+    max-width: 720px;
+    margin: 8px auto 36px;
+    aspect-ratio: 675 / 255;
+    height: auto;
+    border-radius: 18px;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  :root[data-theme='dark'] .hero-parking-canvas {
+    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+
   .hero-canvas-overlay {
-    width: 100%;
-    background: linear-gradient(
-      180deg,
-      var(--color-bg) 0%,
-      rgba(248, 250, 252, 0.85) 35%,
-      rgba(248, 250, 252, 0.4) 65%,
-      transparent 100%
-    );
-  }
-
-  :root[data-theme='dark'] .hero-canvas-overlay {
-    background: linear-gradient(
-      180deg,
-      var(--color-bg) 0%,
-      rgba(11, 18, 32, 0.85) 35%,
-      rgba(11, 18, 32, 0.4) 65%,
-      transparent 100%
-    );
-  }
-
-  .hero-bottom-elements {
-    bottom: 12px;
-    left: 16px;
-    right: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-  }
-
-  .pass-circle {
-    width: 95px;
-    height: 95px;
-  }
-
-  .floating-availability-card {
-    padding: 6px 12px;
-    gap: 8px;
-  }
-
-  .satellite-cta {
-    width: 44px;
-    height: 44px;
+    display: none;
   }
 }
 
-@media (max-width: 480px) {
-  .hero-section {
-    min-height: 560px;
-  }
-
+@media (max-width: 640px) {
   .hero-overlay-content {
-    padding: 28px 12px 170px;
+    padding: 24px 16px 16px;
   }
 
-  .hero-bottom-elements {
+  .hero-parking-canvas {
+    width: calc(100% - 24px);
+    margin: 6px auto 28px;
+    border-radius: 14px;
+    aspect-ratio: 675 / 255;
+  }
+
+  .hero-ctas {
     flex-direction: column;
-    align-items: center;
+    width: 100%;
     gap: 10px;
   }
 
-  .hero-card-group {
-    gap: 8px;
+  .cta-primary,
+  .cta-secondary {
+    width: 100%;
+    justify-content: center;
   }
 
-  .pass-circle {
-    width: 80px;
-    height: 80px;
+  .hero-stats {
+    gap: 12px;
+    padding-top: 16px;
+    margin-top: 6px;
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .stat-number {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.6875rem;
   }
 }
 </style>
