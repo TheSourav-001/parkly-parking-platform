@@ -5,6 +5,7 @@ import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import ForgotPasswordView from '../views/auth/ForgotPasswordView.vue'
 import ResetPasswordView from '../views/auth/ResetPasswordView.vue'
+import ProfileView from '../views/ProfileView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const routes = [
@@ -13,6 +14,12 @@ const routes = [
     name: 'home',
     component: HomePage,
     meta: { title: 'Parkly — Discover & Book Smart Parking', isAuth: false },
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: ProfileView,
+    meta: { title: 'My Profile — Parkly', isAuth: false, requiresAuth: true },
   },
   {
     path: '/design-system',
@@ -53,12 +60,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to) {
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth', top: 96 }
+    }
     return { top: 0 }
   },
 })
 
-// Route guard to handle guestOnly routes and post-Google callback
+// Route guard to handle guestOnly & requiresAuth routes and post-Google callback
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
@@ -74,6 +84,11 @@ router.beforeEach(async (to, from, next) => {
   // Prevent authenticated users from visiting guestOnly auth pages
   if (to.meta?.guestOnly && authStore.isAuthenticated) {
     return next({ path: '/' })
+  }
+
+  // Prevent unauthenticated users from visiting requiresAuth pages
+  if (to.meta?.requiresAuth && !authStore.isAuthenticated) {
+    return next({ path: '/login', query: { redirect: to.fullPath } })
   }
 
   next()

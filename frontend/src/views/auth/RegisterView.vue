@@ -23,6 +23,7 @@ const form = reactive({
   phone: '',
   password: '',
   password_confirmation: '',
+  role: 'driver',
   agreeToTerms: false,
 })
 
@@ -32,6 +33,7 @@ const errors = reactive({
   phone: '',
   password: '',
   password_confirmation: '',
+  role: '',
   agreeToTerms: '',
   general: '',
 })
@@ -40,6 +42,7 @@ const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const isSubmitting = ref(false)
 const notificationMessage = ref('')
+const isOperatorPending = ref(false)
 
 function toggleShowPassword() {
   showPassword.value = !showPassword.value
@@ -56,8 +59,14 @@ function validateForm() {
   errors.phone = ''
   errors.password = ''
   errors.password_confirmation = ''
+  errors.role = ''
   errors.agreeToTerms = ''
   errors.general = ''
+
+  if (!form.role) {
+    errors.role = 'Please select an account type'
+    isValid = false
+  }
 
   if (!form.name.trim()) {
     errors.name = 'Full name is required'
@@ -111,17 +120,23 @@ async function handleRegister() {
   isSubmitting.value = true
   errors.general = ''
   notificationMessage.value = ''
+  isOperatorPending.value = false
 
   try {
-    await authStore.register({
+    const response = await authStore.register({
       name: form.name.trim(),
       email: form.email.trim(),
       phone: form.phone.trim() || null,
       password: form.password,
       password_confirmation: form.password_confirmation,
+      role: form.role,
     })
 
-    router.push('/')
+    if (form.role === 'operator') {
+      isOperatorPending.value = true
+    } else {
+      router.push('/')
+    }
   } catch (err) {
     if (err.response?.status === 422) {
       const responseErrors = err.response?.data?.errors
@@ -131,6 +146,7 @@ async function handleRegister() {
         if (responseErrors.phone) errors.phone = responseErrors.phone[0]
         if (responseErrors.password) errors.password = responseErrors.password[0]
         if (responseErrors.password_confirmation) errors.password_confirmation = responseErrors.password_confirmation[0]
+        if (responseErrors.role) errors.role = responseErrors.role[0]
       } else {
         errors.general = err.response?.data?.message || 'Validation failed. Please verify your details.'
       }
@@ -152,9 +168,29 @@ function handleGoogleSignUp() {
   <AuthCard
     title="Create Your Parkly Account"
     subtitle="Join Parkly and make parking easier."
+    compact
   >
+    <!-- Pending Approval Banner for Operator -->
+    <div v-if="isOperatorPending" class="success-alert" role="status">
+      <svg class="alert-icon success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
+      <div>
+        <p class="alert-title">Operator Registration Submitted</p>
+        <p class="alert-body">
+          Your Parking Operator application has been received and is pending administrator review. Once verified, you will be able to log in to manage your facility.
+        </p>
+        <router-link to="/login">
+          <AppButton variant="primary" size="sm" class="mt-3">
+            Go to Sign In
+          </AppButton>
+        </router-link>
+      </div>
+    </div>
+
     <!-- General Error Alert -->
-    <div v-if="errors.general" class="error-alert" role="alert">
+    <div v-else-if="errors.general" class="error-alert" role="alert">
       <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -167,14 +203,73 @@ function handleGoogleSignUp() {
     <div v-if="notificationMessage" class="info-alert" role="status">
       <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
         <line x1="12" y1="8" x2="12.01" y2="8"></line>
       </svg>
       <span>{{ notificationMessage }}</span>
     </div>
 
     <!-- Registration Form -->
-    <form class="auth-form" @submit.prevent="handleRegister" novalidate>
+    <form v-if="!isOperatorPending" class="auth-form" @submit.prevent="handleRegister" novalidate>
+      <!-- Account Type Selection Section -->
+      <div class="account-type-section">
+        <label class="account-type-heading">Choose Account Type</label>
+        <div class="account-type-grid">
+          <!-- Driver Choice -->
+          <div
+            class="type-card"
+            :class="{ 'is-selected': form.role === 'driver' }"
+            tabindex="0"
+            role="button"
+            @click="form.role = 'driver'"
+            @keydown.enter.prevent="form.role = 'driver'"
+            @keydown.space.prevent="form.role = 'driver'"
+          >
+            <div class="type-icon-wrapper">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2" />
+                <circle cx="7" cy="17" r="2" />
+                <path d="M9 17h6" />
+                <circle cx="17" cy="17" r="2" />
+              </svg>
+            </div>
+            <div class="type-info">
+              <div class="type-title">Driver</div>
+              <div class="type-desc">Find, book, and pay for parking spots instantly.</div>
+            </div>
+            <div class="type-radio-indicator">
+              <span v-if="form.role === 'driver'" class="radio-inner-dot"></span>
+            </div>
+          </div>
+
+          <!-- Parking Operator Choice -->
+          <div
+            class="type-card"
+            :class="{ 'is-selected': form.role === 'operator' }"
+            tabindex="0"
+            role="button"
+            @click="form.role = 'operator'"
+            @keydown.enter.prevent="form.role = 'operator'"
+            @keydown.space.prevent="form.role = 'operator'"
+          >
+            <div class="type-icon-wrapper">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M9 17V9h4a3 3 0 0 1 0 6H9" />
+              </svg>
+            </div>
+            <div class="type-info">
+              <div class="type-title">Parking Operator</div>
+              <div class="type-desc">Manage parking facilities, capacity, and rates (requires approval).</div>
+            </div>
+            <div class="type-radio-indicator">
+              <span v-if="form.role === 'operator'" class="radio-inner-dot"></span>
+            </div>
+          </div>
+        </div>
+        <p v-if="errors.role" class="error-text" role="alert">{{ errors.role }}</p>
+      </div>
+
       <div class="form-row-grid">
         <AppInput
           id="reg-name"
@@ -357,6 +452,187 @@ function handleGoogleSignUp() {
   gap: var(--space-3);
 }
 
+@media (min-width: 961px) {
+  :deep(.auth-viewport-wrapper--compact) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  :deep(.auth-split-card--compact .auth-right-panel) {
+    padding-top: var(--space-1);
+    padding-bottom: var(--space-1);
+  }
+
+  :deep(.auth-split-card--compact .auth-form-card) {
+    max-width: 500px;
+    gap: 0;
+  }
+
+  :deep(.auth-split-card--compact .auth-form-body) {
+    gap: 0;
+  }
+
+  :deep(.auth-split-card--compact .auth-form-footer) {
+    padding-top: var(--space-1);
+  }
+
+  .auth-form {
+    gap: var(--space-1);
+  }
+
+  .account-type-section {
+    gap: var(--space-1);
+  }
+
+  .account-type-grid,
+  .form-row-grid {
+    gap: var(--space-2);
+  }
+
+  .type-card {
+    padding: 7px 10px;
+  }
+
+  .type-desc {
+    line-height: 1.2;
+  }
+
+  :deep(.parkly-input-group) {
+    gap: 2px;
+  }
+
+  :deep(.input-label) {
+    font-size: var(--font-size-xs);
+  }
+
+  :deep(.input-control) {
+    height: 36px;
+    padding-top: var(--space-1);
+    padding-bottom: var(--space-1);
+    font-size: var(--font-size-xs);
+  }
+
+  :deep(.google-btn) {
+    height: 38px;
+  }
+
+  :deep(.parkly-button.size-md) {
+    height: 36px;
+    padding-top: var(--space-1);
+    padding-bottom: var(--space-1);
+  }
+}
+
+.account-type-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: 2px;
+}
+
+.account-type-heading {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.account-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+@media (max-width: 540px) {
+  .account-type-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.type-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.type-card:hover {
+  border-color: var(--color-border-hover);
+  background-color: var(--color-surface-subtle);
+}
+
+.type-card:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+}
+
+.type-card.is-selected {
+  border-color: var(--color-primary);
+  background-color: rgba(13, 148, 136, 0.06);
+}
+
+:global([data-theme="dark"]) .type-card.is-selected {
+  background-color: rgba(13, 148, 136, 0.12);
+}
+
+.type-icon-wrapper {
+  color: var(--color-primary);
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.type-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.type-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.type-desc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+.type-radio-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: border-color var(--transition-fast);
+}
+
+.type-card.is-selected .type-radio-indicator {
+  border-color: var(--color-primary);
+}
+
+.radio-inner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+}
+
 .error-alert {
   display: flex;
   align-items: center;
@@ -369,6 +645,49 @@ function handleGoogleSignUp() {
   font-size: var(--font-size-xs);
   line-height: 1.4;
   margin-bottom: var(--space-2);
+}
+
+.success-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+}
+
+.alert-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.success-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--color-success);
+  margin-top: 2px;
+}
+
+.alert-title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.alert-body {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mt-3 {
+  margin-top: var(--space-3);
 }
 
 .form-row-grid {
@@ -438,7 +757,7 @@ function handleGoogleSignUp() {
   font-size: 11px;
   color: var(--color-error);
   margin: 0;
-  padding-left: 22px;
+  padding-left: 2px;
   line-height: 1.2;
 }
 
@@ -446,7 +765,7 @@ function handleGoogleSignUp() {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: var(--space-3) 0;
+  margin: var(--space-2) 0;
 }
 
 .auth-divider::before,
@@ -494,12 +813,5 @@ function handleGoogleSignUp() {
   border-radius: var(--radius-md);
   font-size: var(--font-size-xs);
   margin-bottom: var(--space-2);
-}
-
-.alert-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  color: var(--color-primary);
 }
 </style>

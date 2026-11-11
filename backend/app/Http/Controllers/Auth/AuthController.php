@@ -27,27 +27,42 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
+        // Enforce supported account types (driver or operator); default to driver
+        $selectedRole = 'driver';
+        if (!empty($validated['role']) && in_array($validated['role'], ['driver', 'operator'], true)) {
+            $selectedRole = $validated['role'];
+        }
+
+        // Drivers are active immediately; Operators require administrative verification (pending)
+        $isActive = ($selectedRole === 'driver');
+
         // Enforce server-managed attributes for security
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'password' => $validated['password'], // Automatically hashed by User model casts
-            'role' => 'driver',
-            'is_active' => true,
+            'role' => $selectedRole,
+            'is_active' => $isActive,
         ]);
 
-        // Authenticate the newly registered user in the session
-        Auth::guard('web')->login($user);
+        // Only log in active users automatically. Inactive/pending operators must wait for approval.
+        if ($isActive) {
+            Auth::guard('web')->login($user);
 
-        // Regenerate session ID to prevent session fixation when session is present
-        if ($request->hasSession()) {
-            $request->session()->regenerate();
+            // Regenerate session ID to prevent session fixation when session is present
+            if ($request->hasSession()) {
+                $request->session()->regenerate();
+            }
         }
+
+        $message = $isActive
+            ? 'User registered successfully.'
+            : 'Registration submitted successfully. Your Parking Operator account is pending administrative verification.';
 
         return response()->json([
             'status' => 'success',
-            'message' => 'User registered successfully.',
+            'message' => $message,
             'data' => [
                 'user' => $this->sanitizeUser($user),
             ],

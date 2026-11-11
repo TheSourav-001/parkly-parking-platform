@@ -24,12 +24,16 @@ defineProps({
     type: String,
     default: '',
   },
+  compact: {
+    type: Boolean,
+    default: false,
+  },
 })
 </script>
 
 <template>
-  <div class="auth-viewport-wrapper">
-    <div class="auth-split-card">
+  <div class="auth-viewport-wrapper" :class="{ 'auth-viewport-wrapper--compact': compact }">
+    <div class="auth-split-card" :class="{ 'auth-split-card--compact': compact }">
       <!-- ================= LEFT PANEL: BRAND & ANIMATED SCENE ================= -->
       <aside class="auth-left-panel">
         <div class="left-panel-content">
@@ -98,14 +102,14 @@ defineProps({
 </template>
 
 <style scoped>
-/* Main Full-Viewport Container: guarantees 100% fit within common desktop viewports */
+/* Main Full-Viewport Container: guarantees clean fit below the floating pill Navbar */
 .auth-viewport-wrapper {
-  height: calc(100svh - 58px);
+  height: calc(100svh - 92px);
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-4) var(--space-4);
   box-sizing: border-box;
   background-color: var(--color-bg);
   overflow-y: auto;
@@ -114,8 +118,8 @@ defineProps({
 .auth-split-card {
   max-width: 1080px;
   width: 100%;
-  max-height: calc(100svh - 76px);
-  min-height: 520px;
+  max-height: calc(100svh - 116px);
+  min-height: 500px;
   display: flex;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -279,8 +283,8 @@ defineProps({
 @media (max-width: 960px) {
   .auth-viewport-wrapper {
     height: auto;
-    min-height: calc(100svh - 58px);
-    padding: var(--space-4) var(--space-2);
+    min-height: calc(100svh - 92px);
+    padding: var(--space-3) var(--space-2) var(--space-5);
   }
 
   .auth-split-card {

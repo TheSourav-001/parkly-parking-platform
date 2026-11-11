@@ -75,10 +75,13 @@ export const useAuthStore = defineStore('auth', {
           phone: payload.phone || null,
           password: payload.password,
           password_confirmation: payload.password_confirmation,
+          role: payload.role || 'driver',
         })
 
-        // Verify and sync state via /me
-        await this.fetchUser()
+        // If the newly registered user is active (Driver), verify and sync state via /me
+        if (response.data?.data?.user?.is_active) {
+          await this.fetchUser()
+        }
         return response.data
       } catch (err) {
         this.error = err.response?.data?.message || 'Registration failed.'
