@@ -22,10 +22,10 @@ const aiQuery = ref('')
 const isDetectingGps = ref(false)
 
 const vehicleOptions = [
-  { id: 'car', label: 'Car / Sedan', icon: '🚗' },
-  { id: 'suv', label: 'SUV / 4x4', icon: '🚙' },
-  { id: 'bike', label: 'Motorbike', icon: '🏍️' },
-  { id: 'ev', label: 'EV (Charger)', icon: '⚡' },
+  { id: 'car', label: 'Car / Sedan', icon: '' },
+  { id: 'suv', label: 'SUV / 4x4', icon: '' },
+  { id: 'bike', label: 'Motorbike', icon: '' },
+  { id: 'ev', label: 'EV (Charger)', icon: '' },
 ]
 
 const durationOptions = [
