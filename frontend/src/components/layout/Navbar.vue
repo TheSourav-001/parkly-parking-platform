@@ -3,10 +3,13 @@
  * Navbar Component — Mastercard-Inspired Floating Pill Navigation
  * Floating pill-shaped bar docked below the viewport top with rounded shoulders.
  * Uses Parkly's existing Navy + Teal tokens & light/dark theme switching.
+ * Integrates Vue Router auth links and Pinia auth state (Login, Register, Logout).
  */
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import AppButton from '../common/AppButton.vue'
+import { useAuthStore } from '../../stores/auth'
 
 defineProps({
   activeSection: {
@@ -17,8 +20,12 @@ defineProps({
 
 const emit = defineEmits(['openSearch', 'navigate'])
 
+const router = useRouter()
+const authStore = useAuthStore()
+
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
+const isLoggingOut = ref(false)
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -30,6 +37,17 @@ function closeMobileMenu() {
 
 function handleScroll() {
   isScrolled.value = window.scrollY > 20
+}
+
+async function handleLogout() {
+  isLoggingOut.value = true
+  try {
+    await authStore.logout()
+    router.push('/login')
+  } finally {
+    isLoggingOut.value = false
+    closeMobileMenu()
+  }
 }
 
 onMounted(() => {
@@ -45,7 +63,7 @@ onUnmounted(() => {
   <header class="parkly-navbar-wrapper" :class="{ 'is-scrolled': isScrolled }">
     <div class="navbar-pill">
       <!-- Brand Logo -->
-      <a href="#" class="brand-group" aria-label="Parkly Home" @click="closeMobileMenu">
+      <router-link to="/" class="brand-group" aria-label="Parkly Home" @click="closeMobileMenu">
         <div class="brand-symbol" aria-hidden="true">
           <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="symbol-svg">
             <rect width="32" height="32" rx="10" fill="currentColor" class="symbol-bg" />
@@ -60,7 +78,7 @@ onUnmounted(() => {
         <div class="brand-text">
           <span class="brand-name">Parkly</span>
         </div>
-      </a>
+      </router-link>
 
       <!-- Desktop Links: Airy pill spacing -->
       <nav class="nav-links" aria-label="Main Navigation">
@@ -72,7 +90,7 @@ onUnmounted(() => {
         <a href="#support" class="nav-link">Support</a>
       </nav>
 
-      <!-- Right Actions: Search Circle + Theme Toggle + Sign In + Get Started -->
+      <!-- Right Actions: Search Circle + Theme Toggle + Sign In / User Profile + Get Started -->
       <div class="nav-actions">
         <!-- Circular Search Trigger -->
         <button
@@ -101,18 +119,39 @@ onUnmounted(() => {
         <!-- Theme Toggle -->
         <ThemeToggle />
 
-        <!-- Auth CTAs -->
-        <a href="#signin" class="nav-signin-link">Sign In</a>
+        <!-- Unauthenticated Guest CTAs -->
+        <template v-if="!authStore.isAuthenticated">
+          <router-link to="/login" class="nav-signin-link">Sign In</router-link>
 
-        <AppButton
-          variant="primary"
-          size="sm"
-          pill
-          class="btn-get-started"
-          @click="$emit('navigate', 'discovery')"
-        >
-          Get Started
-        </AppButton>
+          <router-link to="/register">
+            <AppButton
+              variant="primary"
+              size="sm"
+              pill
+              class="btn-get-started"
+            >
+              Get Started
+            </AppButton>
+          </router-link>
+        </template>
+
+        <!-- Authenticated User Profile & Logout -->
+        <template v-else>
+          <div class="user-badge" :title="authStore.userEmail">
+            <span class="user-name">{{ authStore.userName }}</span>
+            <span class="user-role">{{ authStore.userRole }}</span>
+          </div>
+          <AppButton
+            variant="ghost"
+            size="sm"
+            pill
+            class="btn-logout"
+            :loading="isLoggingOut"
+            @click="handleLogout"
+          >
+            Logout
+          </AppButton>
+        </template>
 
         <!-- Mobile Hamburger Button -->
         <button
@@ -177,8 +216,30 @@ onUnmounted(() => {
             <a href="#support" class="mobile-link" @click="closeMobileMenu">Support</a>
           </div>
           <div class="mobile-drawer-footer">
-            <AppButton variant="secondary" size="md" pill block @click="closeMobileMenu">Sign In</AppButton>
-            <AppButton variant="primary" size="md" pill block @click="closeMobileMenu">Get Started</AppButton>
+            <template v-if="!authStore.isAuthenticated">
+              <router-link to="/login" @click="closeMobileMenu">
+                <AppButton variant="secondary" size="md" pill block>Sign In</AppButton>
+              </router-link>
+              <router-link to="/register" @click="closeMobileMenu">
+                <AppButton variant="primary" size="md" pill block>Get Started</AppButton>
+              </router-link>
+            </template>
+            <template v-else>
+              <div class="mobile-user-info">
+                <div class="user-name">{{ authStore.userName }}</div>
+                <div class="user-email">{{ authStore.userEmail }}</div>
+              </div>
+              <AppButton
+                variant="secondary"
+                size="md"
+                pill
+                block
+                :loading="isLoggingOut"
+                @click="handleLogout"
+              >
+                Logout
+              </AppButton>
+            </template>
           </div>
         </div>
       </div>
@@ -206,26 +267,35 @@ onUnmounted(() => {
 .navbar-pill {
   pointer-events: auto;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1240px;
   height: 60px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill, 999px);
-  padding: 0 16px 0 20px;
+  padding: 0 10px 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-nav-pill);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: var(--space-4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 10px 30px -10px rgba(15, 23, 42, 0.08),
+    0 2px 6px -1px rgba(15, 23, 42, 0.04);
   transition:
     background-color var(--transition-normal),
     border-color var(--transition-normal),
     box-shadow var(--transition-normal),
-    transform var(--transition-fast);
+    transform var(--transition-normal);
 }
 
-/* Brand */
+:global([data-theme="dark"]) .navbar-pill {
+  box-shadow:
+    0 14px 34px -10px rgba(0, 0, 0, 0.45),
+    0 2px 8px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Brand Group */
 .brand-group {
   display: flex;
   align-items: center;
@@ -248,39 +318,32 @@ onUnmounted(() => {
 .symbol-svg {
   width: 100%;
   height: 100%;
-  border-radius: 9px;
-  display: block;
 }
 
 .symbol-orbit-dot {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 7px;
-  height: 7px;
+  top: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-surface);
-}
-
-.brand-text {
-  display: flex;
-  align-items: center;
+  background-color: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
 }
 
 .brand-name {
+  font-family: var(--font-family-display, inherit);
   font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   color: var(--color-text);
-  line-height: 1;
 }
 
-/* Nav links */
+/* Nav Links */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 22px;
 }
 
 .nav-link {
@@ -374,6 +437,50 @@ onUnmounted(() => {
   height: 36px !important;
 }
 
+.user-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: var(--space-2);
+}
+
+.user-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+}
+
+.mobile-user-info {
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.mobile-user-info .user-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.mobile-user-info .user-email {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  word-break: break-all;
+}
+
 .mobile-menu-btn {
   display: none;
 }
@@ -385,11 +492,12 @@ onUnmounted(() => {
   inset: 0;
   background-color: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 200;
+  padding: 16px;
   display: flex;
-  justify-content: center;
   align-items: flex-start;
-  padding: 20px 16px;
+  justify-content: center;
 }
 
 .mobile-drawer-pill {
@@ -398,62 +506,61 @@ onUnmounted(() => {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 28px;
-  padding: 24px;
-  box-shadow: var(--shadow-halo);
+  padding: 20px 24px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .mobile-drawer-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--color-border);
-  padding-bottom: 12px;
 }
 
 .mobile-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  color: var(--color-primary);
 }
 
 .eyebrow-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: var(--color-primary);
+  background-color: var(--color-accent);
 }
 
 .mobile-drawer-close {
-  background: none;
+  background: transparent;
   border: none;
-  font-size: 28px;
+  font-size: 1.5rem;
   line-height: 1;
   color: var(--color-text-muted);
   cursor: pointer;
-  padding: 0 6px;
+  padding: 0 4px;
 }
 
 .mobile-drawer-links {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
 .mobile-link {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 500;
-  letter-spacing: -0.01em;
   color: var(--color-text);
-  padding: 10px 14px;
-  border-radius: 12px;
   text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 12px;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
@@ -467,14 +574,14 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-top: 10px;
+  padding-top: 12px;
   border-top: 1px solid var(--color-border);
 }
 
 /* Drawer Transitions */
 .drawer-fade-enter-active,
 .drawer-fade-leave-active {
-  transition: opacity var(--transition-normal);
+  transition: opacity 0.2s ease;
 }
 
 .drawer-fade-enter-from,
@@ -482,39 +589,44 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Breakpoints */
-@media (max-width: 1080px) {
-  .nav-links {
-    gap: 18px;
-  }
+.drawer-fade-enter-active .mobile-drawer-pill,
+.drawer-fade-leave-active .mobile-drawer-pill {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (max-width: 900px) {
+.drawer-fade-enter-from .mobile-drawer-pill {
+  transform: translateY(-16px) scale(0.97);
+}
+
+.drawer-fade-leave-to .mobile-drawer-pill {
+  transform: translateY(-8px) scale(0.98);
+}
+
+/* Responsive: Hide desktop links on tablet/mobile */
+@media (max-width: 992px) {
   .nav-links {
     display: none;
-  }
-
-  .nav-signin-link {
-    display: none;
-  }
-
-  .mobile-menu-btn {
-    display: inline-flex;
   }
 }
 
 @media (max-width: 640px) {
   .parkly-navbar-wrapper {
-    padding: 12px 14px;
+    padding: 10px 14px;
   }
 
   .navbar-pill {
+    padding: 0 8px 0 16px;
     height: 54px;
-    padding: 0 10px 0 16px;
   }
 
-  .btn-get-started {
+  .nav-signin-link,
+  .btn-get-started,
+  .user-badge {
     display: none;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
   }
 }
 </style>

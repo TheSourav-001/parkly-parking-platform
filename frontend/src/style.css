@@ -202,6 +202,13 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   transition: background-color var(--transition-normal), color var(--transition-normal);
+  scrollbar-gutter: stable;
+}
+
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll;
+  }
 }
 
 body {

@@ -1,11 +1,17 @@
 <script setup>
 /**
  * Main Application Shell for Parkly Frontend
- * Integrates floating pill Navbar, Homepage, and dark editorial Footer.
+ * Dynamically renders the compact AuthNavbar on authentication routes (/login, /register, etc.)
+ * while rendering the floating pill Navbar, HomePage, and dark editorial Footer on standard routes.
  */
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Navbar from './components/layout/Navbar.vue'
+import AuthNavbar from './components/layout/AuthNavbar.vue'
 import Footer from './components/layout/Footer.vue'
-import HomePage from './components/HomePage.vue'
+
+const route = useRoute()
+const isAuthRoute = computed(() => Boolean(route.meta && route.meta.isAuth))
 
 function handleOpenSearch() {
   const el = document.getElementById('discovery')
@@ -23,20 +29,26 @@ function handleNavigate(targetId) {
 </script>
 
 <template>
-  <div class="parkly-app">
-    <!-- Floating Pill Navigation -->
+  <div class="parkly-app" :class="{ 'is-auth-view': isAuthRoute }">
+    <!-- Render AuthNavbar on auth pages, standard floating Navbar elsewhere -->
+    <AuthNavbar v-if="isAuthRoute" />
     <Navbar
+      v-else
       @openSearch="handleOpenSearch"
       @navigate="handleNavigate"
     />
 
-    <!-- Main Content Area -->
-    <div class="content-container">
-      <HomePage />
-    </div>
+    <!-- Main Content Area with Router View -->
+    <main class="content-container">
+      <router-view v-slot="{ Component }">
+        <transition name="page-fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </main>
 
-    <!-- Editorial Dark Footer -->
-    <Footer />
+    <!-- Marketing Footer is hidden on authentication routes -->
+    <Footer v-if="!isAuthRoute" />
   </div>
 </template>
 
@@ -52,9 +64,30 @@ function handleNavigate(targetId) {
   position: relative;
 }
 
+.parkly-app.is-auth-view {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 .content-container {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+}
+
+/* Smooth, modern page transition */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>
