@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomePage from '../components/HomePage.vue'
 import DesignSystemShowcase from '../components/DesignSystemShowcase.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
@@ -10,6 +11,12 @@ const routes = [
   {
     path: '/',
     name: 'home',
+    component: HomePage,
+    meta: { title: 'Parkly — Discover & Book Smart Parking', isAuth: false },
+  },
+  {
+    path: '/design-system',
+    name: 'design-system',
     component: DesignSystemShowcase,
     meta: { title: 'Parkly — Design System', isAuth: false },
   },

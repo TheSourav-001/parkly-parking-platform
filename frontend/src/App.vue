@@ -2,7 +2,7 @@
 /**
  * Main Application Shell for Parkly Frontend
  * Dynamically renders the compact AuthNavbar on authentication routes (/login, /register, etc.)
- * while hiding the heavy marketing links and footer to ensure a pristine full-viewport experience.
+ * while rendering the floating pill Navbar, HomePage, and dark editorial Footer on standard routes.
  */
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -12,14 +12,33 @@ import Footer from './components/layout/Footer.vue'
 
 const route = useRoute()
 const isAuthRoute = computed(() => Boolean(route.meta && route.meta.isAuth))
+
+function handleOpenSearch() {
+  const el = document.getElementById('discovery')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' })
+  }
+}
+
+function handleNavigate(targetId) {
+  const el = document.getElementById(targetId)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' })
+  }
+}
 </script>
 
 <template>
   <div class="parkly-app" :class="{ 'is-auth-view': isAuthRoute }">
-    <!-- Render AuthNavbar on auth pages, standard Navbar elsewhere -->
+    <!-- Render AuthNavbar on auth pages, standard floating Navbar elsewhere -->
     <AuthNavbar v-if="isAuthRoute" />
-    <Navbar v-else />
+    <Navbar
+      v-else
+      @openSearch="handleOpenSearch"
+      @navigate="handleNavigate"
+    />
 
+    <!-- Main Content Area with Router View -->
     <main class="content-container">
       <router-view v-slot="{ Component }">
         <transition name="page-fade" mode="out-in">
@@ -42,6 +61,7 @@ const isAuthRoute = computed(() => Boolean(route.meta && route.meta.isAuth))
   width: 100%;
   background-color: var(--color-bg);
   color: var(--color-text);
+  position: relative;
 }
 
 .parkly-app.is-auth-view {
