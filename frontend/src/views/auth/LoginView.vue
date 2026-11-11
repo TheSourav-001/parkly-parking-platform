@@ -4,15 +4,18 @@
  * Route: /login
  * Heading: "Welcome Back"
  * Subtitle: "Sign in to continue your parking journey."
- *
- * Compact & perfectly proportioned to fit standard desktop viewports (1366x768, 1440x900, 1920x1080)
- * without any page scrolling.
  */
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import AuthCard from '../../components/auth/AuthCard.vue'
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton.vue'
 import AppButton from '../../components/common/AppButton.vue'
 import AppInput from '../../components/common/AppInput.vue'
+import { useAuthStore } from '../../stores/auth'
+
+const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
 
 const form = reactive({
   email: '',
@@ -29,6 +32,13 @@ const errors = reactive({
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 const notificationMessage = ref('')
+
+onMounted(() => {
+  // Check for Google OAuth callback failure
+  if (route.query.google === 'failed') {
+    errors.general = 'Google sign-in was canceled or could not be verified. Please try again.'
+  }
+})
 
 function toggleShowPassword() {
   showPassword.value = !showPassword.value
@@ -51,28 +61,54 @@ function validateForm() {
   if (!form.password) {
     errors.password = 'Password is required'
     isValid = false
-  } else if (form.password.length < 6) {
-    errors.password = 'Password must be at least 6 characters'
+  } else if (form.password.length < 8) {
+    errors.password = 'Password must be at least 8 characters'
     isValid = false
   }
 
   return isValid
 }
 
-function handleLogin() {
+async function handleLogin() {
+  if (isSubmitting.value) return
   if (!validateForm()) return
 
   isSubmitting.value = true
+  errors.general = ''
   notificationMessage.value = ''
 
-  setTimeout(() => {
+  try {
+    await authStore.login({
+      email: form.email,
+      password: form.password,
+      remember: form.remember,
+    })
+
+    router.push('/')
+  } catch (err) {
+    if (err.response?.status === 422 || err.response?.status === 401) {
+      const responseErrors = err.response?.data?.errors
+      if (responseErrors) {
+        if (responseErrors.email) errors.email = responseErrors.email[0]
+        if (responseErrors.password) errors.password = responseErrors.password[0]
+      } else {
+        errors.general = err.response?.data?.message || 'Invalid email or password.'
+      }
+    } else if (err.response?.status === 403) {
+      errors.general = err.response?.data?.message || 'Your account is inactive. Please contact support.'
+    } else if (err.response?.status === 429) {
+      errors.general = err.response?.data?.message || 'Too many attempts. Please try again later.'
+    } else {
+      errors.general = 'Unable to connect to the authentication server. Please check your connection.'
+    }
+  } finally {
     isSubmitting.value = false
-    notificationMessage.value = 'Form validated successfully. Connecting to backend session...'
-  }, 450)
+  }
 }
 
 function handleGoogleSignIn() {
-  notificationMessage.value = 'Redirecting to Google OAuth authentication...'
+  const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+  window.location.href = `${apiBase}/auth/google/redirect`
 }
 </script>
 
@@ -81,6 +117,16 @@ function handleGoogleSignIn() {
     title="Welcome Back"
     subtitle="Sign in to continue your parking journey."
   >
+    <!-- General Error Banner -->
+    <div v-if="errors.general" class="error-alert" role="alert">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errors.general }}</span>
+    </div>
+
     <!-- Notification Banner -->
     <div v-if="notificationMessage" class="info-alert" role="status">
       <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -196,35 +242,51 @@ function handleGoogleSignIn() {
   gap: var(--space-3);
 }
 
+.error-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+  margin-bottom: var(--space-2);
+}
+
 .toggle-pwd-btn {
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--color-text-muted);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 2px;
+  border-radius: var(--radius-sm);
   transition: color var(--transition-fast);
 }
 
 .toggle-pwd-btn:hover {
-  color: var(--color-text);
+  color: var(--color-primary);
 }
 
 .form-row-between {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--font-size-xs);
-  gap: var(--space-2);
+  margin-top: -2px;
+  margin-bottom: 2px;
 }
 
 .checkbox-label {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--space-2);
-  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
   cursor: pointer;
   user-select: none;
 }
@@ -233,31 +295,15 @@ function handleGoogleSignIn() {
   accent-color: var(--color-primary);
   width: 14px;
   height: 14px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  border-radius: var(--radius-xs);
-}
-
-.auth-link {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
-}
-
-.auth-link:hover {
-  text-decoration: underline;
-}
-
-.auth-link.strong {
-  font-weight: var(--font-weight-semibold);
-  margin-left: var(--space-1);
 }
 
 .auth-divider {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: var(--space-1) 0;
+  margin: var(--space-3) 0;
 }
 
 .auth-divider::before,
@@ -268,29 +314,49 @@ function handleGoogleSignIn() {
 }
 
 .divider-text {
-  padding: 0 var(--space-3);
-  font-size: 0.68rem;
+  padding: 0 var(--space-2);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.auth-link {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: opacity var(--transition-fast);
+}
+
+.auth-link:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+.auth-link.strong {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-subtle);
-  letter-spacing: 0.05em;
+  margin-left: 2px;
 }
 
 .info-alert {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
   padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   border-radius: var(--radius-md);
   font-size: var(--font-size-xs);
-  line-height: var(--line-height-normal);
-  border: 1px solid var(--color-primary);
+  margin-bottom: var(--space-2);
 }
 
 .alert-icon {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+  color: var(--color-primary);
 }
 </style>

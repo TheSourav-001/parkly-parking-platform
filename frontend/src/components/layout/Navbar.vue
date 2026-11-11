@@ -5,13 +5,29 @@
  * Modern minimal layout with logo, tagline, navigation items, theme toggle, and CTAs.
  */
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import AppButton from '../common/AppButton.vue'
+import { useAuthStore } from '../../stores/auth'
 
+const router = useRouter()
+const authStore = useAuthStore()
 const isMobileMenuOpen = ref(false)
+const isLoggingOut = ref(false)
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+async function handleLogout() {
+  isLoggingOut.value = true
+  try {
+    await authStore.logout()
+    router.push('/login')
+  } finally {
+    isLoggingOut.value = false
+    isMobileMenuOpen.value = false
+  }
 }
 </script>
 
@@ -49,12 +65,33 @@ function toggleMobileMenu() {
       <!-- Right Controls: Theme Toggle & Actions -->
       <div class="nav-actions">
         <ThemeToggle />
-        <router-link to="/login">
-          <AppButton variant="ghost" size="sm" class="btn-signin">Sign In</AppButton>
-        </router-link>
-        <router-link to="/register">
-          <AppButton variant="primary" size="sm">Get Started</AppButton>
-        </router-link>
+
+        <!-- Unauthenticated Guest CTAs -->
+        <template v-if="!authStore.isAuthenticated">
+          <router-link to="/login">
+            <AppButton variant="ghost" size="sm" class="btn-signin">Sign In</AppButton>
+          </router-link>
+          <router-link to="/register">
+            <AppButton variant="primary" size="sm">Get Started</AppButton>
+          </router-link>
+        </template>
+
+        <!-- Authenticated User Profile & Logout -->
+        <template v-else>
+          <div class="user-badge" :title="authStore.userEmail">
+            <span class="user-name">{{ authStore.userName }}</span>
+            <span class="user-role">{{ authStore.userRole }}</span>
+          </div>
+          <AppButton
+            variant="ghost"
+            size="sm"
+            class="btn-logout"
+            :loading="isLoggingOut"
+            @click="handleLogout"
+          >
+            Logout
+          </AppButton>
+        </template>
 
         <!-- Mobile Menu Toggle Button -->
         <button
@@ -106,12 +143,29 @@ function toggleMobileMenu() {
       <a href="#locations" class="mobile-nav-link" @click="isMobileMenuOpen = false">Locations</a>
       <a href="#support" class="mobile-nav-link" @click="isMobileMenuOpen = false">Support</a>
       <div class="mobile-drawer-actions">
-        <router-link to="/login" @click="isMobileMenuOpen = false">
-          <AppButton variant="secondary" size="md" block>Sign In</AppButton>
-        </router-link>
-        <router-link to="/register" @click="isMobileMenuOpen = false">
-          <AppButton variant="primary" size="md" block>Get Started</AppButton>
-        </router-link>
+        <template v-if="!authStore.isAuthenticated">
+          <router-link to="/login" @click="isMobileMenuOpen = false">
+            <AppButton variant="secondary" size="md" block>Sign In</AppButton>
+          </router-link>
+          <router-link to="/register" @click="isMobileMenuOpen = false">
+            <AppButton variant="primary" size="md" block>Get Started</AppButton>
+          </router-link>
+        </template>
+        <template v-else>
+          <div class="mobile-user-info">
+            <div class="user-name">{{ authStore.userName }}</div>
+            <div class="user-email">{{ authStore.userEmail }}</div>
+          </div>
+          <AppButton
+            variant="secondary"
+            size="md"
+            block
+            :loading="isLoggingOut"
+            @click="handleLogout"
+          >
+            Logout
+          </AppButton>
+        </template>
       </div>
     </div>
   </header>
@@ -218,6 +272,50 @@ function toggleMobileMenu() {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.user-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: var(--space-2);
+}
+
+.user-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-role {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+}
+
+.mobile-user-info {
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.mobile-user-info .user-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.mobile-user-info .user-email {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  word-break: break-all;
 }
 
 .mobile-menu-btn {

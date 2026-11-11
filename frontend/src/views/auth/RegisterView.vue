@@ -4,16 +4,18 @@
  * Route: /register
  * Heading: "Create Your Parkly Account"
  * Subtitle: "Join Parkly and make parking easier."
- *
- * Proportionate and compact layout to ensure comfortable desktop fit without clipping,
- * allowing natural scrolling if viewport is exceptionally small.
  */
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import AuthCard from '../../components/auth/AuthCard.vue'
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton.vue'
 import PasswordStrengthBar from '../../components/auth/PasswordStrengthBar.vue'
 import AppButton from '../../components/common/AppButton.vue'
 import AppInput from '../../components/common/AppInput.vue'
+import { useAuthStore } from '../../stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
 
 const form = reactive({
   name: '',
@@ -31,6 +33,7 @@ const errors = reactive({
   password: '',
   password_confirmation: '',
   agreeToTerms: '',
+  general: '',
 })
 
 const showPassword = ref(false)
@@ -54,6 +57,7 @@ function validateForm() {
   errors.password = ''
   errors.password_confirmation = ''
   errors.agreeToTerms = ''
+  errors.general = ''
 
   if (!form.name.trim()) {
     errors.name = 'Full name is required'
@@ -100,20 +104,47 @@ function validateForm() {
   return isValid
 }
 
-function handleRegister() {
+async function handleRegister() {
+  if (isSubmitting.value) return
   if (!validateForm()) return
 
   isSubmitting.value = true
+  errors.general = ''
   notificationMessage.value = ''
 
-  setTimeout(() => {
+  try {
+    await authStore.register({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim() || null,
+      password: form.password,
+      password_confirmation: form.password_confirmation,
+    })
+
+    router.push('/')
+  } catch (err) {
+    if (err.response?.status === 422) {
+      const responseErrors = err.response?.data?.errors
+      if (responseErrors) {
+        if (responseErrors.name) errors.name = responseErrors.name[0]
+        if (responseErrors.email) errors.email = responseErrors.email[0]
+        if (responseErrors.phone) errors.phone = responseErrors.phone[0]
+        if (responseErrors.password) errors.password = responseErrors.password[0]
+        if (responseErrors.password_confirmation) errors.password_confirmation = responseErrors.password_confirmation[0]
+      } else {
+        errors.general = err.response?.data?.message || 'Validation failed. Please verify your details.'
+      }
+    } else {
+      errors.general = 'Unable to complete registration. Please check your network connection.'
+    }
+  } finally {
     isSubmitting.value = false
-    notificationMessage.value = 'Account registration validated. Connecting to backend...'
-  }, 450)
+  }
 }
 
 function handleGoogleSignUp() {
-  notificationMessage.value = 'Redirecting to Google OAuth authentication...'
+  const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+  window.location.href = `${apiBase}/auth/google/redirect`
 }
 </script>
 
@@ -122,6 +153,16 @@ function handleGoogleSignUp() {
     title="Create Your Parkly Account"
     subtitle="Join Parkly and make parking easier."
   >
+    <!-- General Error Alert -->
+    <div v-if="errors.general" class="error-alert" role="alert">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errors.general }}</span>
+    </div>
+
     <!-- Notification Banner -->
     <div v-if="notificationMessage" class="info-alert" role="status">
       <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -303,7 +344,7 @@ function handleGoogleSignUp() {
     <template #footer>
       Already have an account?
       <router-link to="/login" class="auth-link strong">
-        Sign in
+        Sign In
       </router-link>
     </template>
   </AuthCard>
@@ -313,18 +354,33 @@ function handleGoogleSignUp() {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-3);
+}
+
+.error-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+  margin-bottom: var(--space-2);
 }
 
 .form-row-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .form-row-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-3);
   }
 }
 
@@ -333,74 +389,64 @@ function handleGoogleSignUp() {
   border: none;
   cursor: pointer;
   color: var(--color-text-muted);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 2px;
+  border-radius: var(--radius-sm);
   transition: color var(--transition-fast);
 }
 
 .toggle-pwd-btn:hover {
-  color: var(--color-text);
+  color: var(--color-primary);
 }
 
 .terms-group {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  margin-top: -2px;
+  margin-bottom: 2px;
 }
 
 .checkbox-label {
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
   cursor: pointer;
   user-select: none;
+  line-height: 1.35;
 }
 
 .checkbox-input {
   accent-color: var(--color-primary);
   width: 14px;
   height: 14px;
-  margin-top: 2px;
-  flex-shrink: 0;
+  margin-top: 1px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  border-radius: var(--radius-xs);
+  flex-shrink: 0;
 }
 
 .terms-text {
-  font-size: var(--font-size-xs);
-  color: var(--color-text);
-  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
 }
 
 .error-text {
-  font-size: var(--font-size-xs);
-  color: var(--color-danger);
-  margin-top: 1px;
-}
-
-.auth-link {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
-}
-
-.auth-link:hover {
-  text-decoration: underline;
-}
-
-.auth-link.strong {
-  font-weight: var(--font-weight-semibold);
-  margin-left: var(--space-1);
+  font-size: 11px;
+  color: var(--color-error);
+  margin: 0;
+  padding-left: 22px;
+  line-height: 1.2;
 }
 
 .auth-divider {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 4px 0;
+  margin: var(--space-3) 0;
 }
 
 .auth-divider::before,
@@ -411,29 +457,49 @@ function handleGoogleSignUp() {
 }
 
 .divider-text {
-  padding: 0 var(--space-3);
-  font-size: 0.68rem;
+  padding: 0 var(--space-2);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.auth-link {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: opacity var(--transition-fast);
+}
+
+.auth-link:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+.auth-link.strong {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-subtle);
-  letter-spacing: 0.05em;
+  margin-left: 2px;
 }
 
 .info-alert {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
   padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   border-radius: var(--radius-md);
   font-size: var(--font-size-xs);
-  line-height: var(--line-height-normal);
-  border: 1px solid var(--color-primary);
+  margin-bottom: var(--space-2);
 }
 
 .alert-icon {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+  color: var(--color-primary);
 }
 </style>

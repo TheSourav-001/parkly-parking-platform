@@ -4,22 +4,25 @@
  * Route: /forgot-password
  * Heading: "Reset Your Password"
  * Subtitle: "Enter your verified email to receive secure recovery instructions."
- *
- * Integrated into the Premium Split-Screen Authentication Layout.
- * Preserves email validation, generic security success response, and clean UI transitions.
  */
 import { ref } from 'vue'
 import AuthCard from '../../components/auth/AuthCard.vue'
 import AppButton from '../../components/common/AppButton.vue'
 import AppInput from '../../components/common/AppInput.vue'
+import { useAuthStore } from '../../stores/auth'
+
+const authStore = useAuthStore()
 
 const email = ref('')
 const error = ref('')
+const generalError = ref('')
 const successMessage = ref('')
 const isSubmitting = ref(false)
 
 function validateForm() {
   error.value = ''
+  generalError.value = ''
+
   if (!email.value.trim()) {
     error.value = 'Email address is required'
     return false
@@ -31,18 +34,30 @@ function validateForm() {
   return true
 }
 
-function handleForgotPassword() {
+async function handleForgotPassword() {
+  if (isSubmitting.value) return
   if (!validateForm()) return
 
   isSubmitting.value = true
   successMessage.value = ''
+  generalError.value = ''
 
-  setTimeout(() => {
+  try {
+    const data = await authStore.forgotPassword(email.value.trim())
+    // Generic security response from backend to prevent user enumeration
+    successMessage.value = data?.message ||
+      'If an account exists with this email address, password reset instructions have been sent.'
+  } catch (err) {
+    if (err.response?.status === 422) {
+      error.value = err.response?.data?.errors?.email?.[0] || 'Please provide a valid email address.'
+    } else if (err.response?.status === 429) {
+      generalError.value = err.response?.data?.message || 'Too many attempts. Please try again in a few minutes.'
+    } else {
+      generalError.value = 'Unable to send recovery email. Please check your internet connection.'
+    }
+  } finally {
     isSubmitting.value = false
-    // Generic security response to prevent user enumeration
-    successMessage.value =
-      'If an account exists with this email address, password reset instructions have been dispatched. Please check your inbox and spam folder.'
-  }, 500)
+  }
 }
 </script>
 
@@ -51,6 +66,16 @@ function handleForgotPassword() {
     title="Reset Your Password"
     subtitle="Enter your email to receive secure recovery instructions."
   >
+    <!-- General Error Banner -->
+    <div v-if="generalError" class="error-alert" role="alert">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ generalError }}</span>
+    </div>
+
     <!-- Success Banner -->
     <div v-if="successMessage" class="success-alert" role="status">
       <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -102,9 +127,9 @@ function handleForgotPassword() {
 
     <!-- Card Footer -->
     <template #footer>
-      Remembered your password?
+      Remember your credentials?
       <router-link to="/login" class="auth-link strong">
-        Back to Login
+        Back to Sign In
       </router-link>
     </template>
   </AuthCard>
@@ -117,22 +142,36 @@ function handleForgotPassword() {
   gap: var(--space-4);
 }
 
+.error-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+  margin-bottom: var(--space-3);
+}
+
 .success-alert {
   display: flex;
+  align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-4);
-  background-color: var(--color-surface-subtle);
-  border: 1px solid var(--color-success);
+  background-color: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
   border-radius: var(--radius-md);
-  color: var(--color-text);
-  line-height: var(--line-height-normal);
+  margin-bottom: var(--space-4);
 }
 
 .alert-icon {
   width: 20px;
   height: 20px;
-  color: var(--color-success);
   flex-shrink: 0;
+  color: var(--color-success);
   margin-top: 2px;
 }
 
@@ -140,12 +179,14 @@ function handleForgotPassword() {
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
   color: var(--color-text);
-  margin-bottom: var(--space-1);
+  margin: 0 0 var(--space-1) 0;
 }
 
 .alert-body {
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
 }
 
 .resend-action {
@@ -153,18 +194,20 @@ function handleForgotPassword() {
 }
 
 .auth-link {
+  font-size: var(--font-size-xs);
   color: var(--color-primary);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
+  transition: opacity var(--transition-fast);
 }
 
 .auth-link:hover {
+  opacity: 0.85;
   text-decoration: underline;
 }
 
 .auth-link.strong {
   font-weight: var(--font-weight-semibold);
-  margin-left: var(--space-1);
+  margin-left: 2px;
 }
 </style>

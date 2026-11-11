@@ -45,17 +45,8 @@ const isAuthRoute = computed(() => Boolean(route.meta && route.meta.isAuth))
 }
 
 .parkly-app.is-auth-view {
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-@media (max-width: 960px) {
-  .parkly-app.is-auth-view {
-    height: auto;
-    min-height: 100dvh;
-    overflow-y: auto;
-  }
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .content-container {
