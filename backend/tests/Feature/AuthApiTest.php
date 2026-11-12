@@ -718,4 +718,165 @@ class AuthApiTest extends TestCase
                 'message' => 'Your account is inactive. Please contact support.',
             ]);
     }
+
+    /**
+     * Test authenticated user can update their profile info cleanly.
+     */
+    public function test_authenticated_user_can_update_profile_info(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Old Name',
+            'email' => 'old.profile@example.com',
+            'phone' => null,
+            'role' => 'driver',
+            'is_active' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAs($user, 'web')
+            ->withHeaders([
+                'Origin' => 'http://localhost:5173',
+                'Referer' => 'http://localhost:5173/',
+                'Accept' => 'application/json',
+            ])
+            ->putJson('/api/v1/auth/profile', [
+                'name' => 'Updated Name',
+                'email' => 'new.profile@example.com',
+                'phone' => '+8801711223344',
+                'role' => 'admin',
+                'is_active' => false,
+                'google_id' => 'hijack-id',
+                'avatar' => 'https://evil.test/avatar.png',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Profile updated successfully.',
+            ])
+            ->assertJsonPath('data.user.name', 'Updated Name')
+            ->assertJsonPath('data.user.email', 'new.profile@example.com')
+            ->assertJsonPath('data.user.phone', '+8801711223344')
+            ->assertJsonPath('data.user.role', 'driver')
+            ->assertJsonPath('data.user.is_active', true)
+            ->assertJsonPath('data.user.email_verified_at', null)
+            ->assertJsonMissingPath('data.user.password')
+            ->assertJsonMissingPath('data.user.remember_token');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Updated Name',
+            'email' => 'new.profile@example.com',
+            'phone' => '+8801711223344',
+            'role' => 'driver',
+            'is_active' => 1,
+            'google_id' => null,
+        ]);
+    }
+
+    /**
+     * Test unauthenticated user cannot update profile info.
+     */
+    public function test_unauthenticated_user_cannot_update_profile(): void
+    {
+        $response = $this->withHeaders([
+            'Origin' => 'http://localhost:5173',
+            'Referer' => 'http://localhost:5173/',
+            'Accept' => 'application/json',
+        ])->putJson('/api/v1/auth/profile', [
+            'name' => 'Hacker',
+            'email' => 'hacker@example.com',
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    /**
+     * Test profile update rejects email already taken by another user, but allows own email.
+     */
+    public function test_profile_update_validates_unique_email_and_allows_own_email(): void
+    {
+        $other = User::factory()->create(['email' => 'taken.other@example.com']);
+        $user = User::factory()->create([
+            'name' => 'Self User',
+            'email' => 'self.user@example.com',
+            'email_verified_at' => now(),
+        ]);
+
+        $conflictRes = $this->actingAs($user, 'web')
+            ->withHeaders([
+                'Origin' => 'http://localhost:5173',
+                'Referer' => 'http://localhost:5173/',
+                'Accept' => 'application/json',
+            ])
+            ->putJson('/api/v1/auth/profile', [
+                'name' => 'Self User',
+                'email' => $other->email,
+            ]);
+
+        $conflictRes->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+
+        $sameEmailRes = $this->actingAs($user, 'web')
+            ->withHeaders([
+                'Origin' => 'http://localhost:5173',
+                'Referer' => 'http://localhost:5173/',
+                'Accept' => 'application/json',
+            ])
+            ->putJson('/api/v1/auth/profile', [
+                'name' => 'Self User Updated',
+                'email' => 'self.user@example.com',
+                'phone' => '+15551234567',
+            ]);
+
+        $sameEmailRes->assertStatus(200)
+            ->assertJsonPath('data.user.name', 'Self User Updated');
+
+        $this->assertNotNull($user->fresh()->email_verified_at);
+    }
+
+    /**
+     * Test authenticated user can update password with valid current password.
+     */
+    public function test_authenticated_user_can_update_password(): void
+    {
+        $user = User::factory()->create([
+            'password' => 'OldPass123!',
+        ]);
+
+        $wrongRes = $this->actingAs($user, 'web')
+            ->withHeaders([
+                'Origin' => 'http://localhost:5173',
+                'Referer' => 'http://localhost:5173/',
+                'Accept' => 'application/json',
+            ])
+            ->putJson('/api/v1/auth/password', [
+                'current_password' => 'WrongPassword!',
+                'password' => 'NewSecurePass123!',
+                'password_confirmation' => 'NewSecurePass123!',
+            ]);
+
+        $wrongRes->assertStatus(422)
+            ->assertJsonValidationErrors(['current_password']);
+
+        $okRes = $this->actingAs($user, 'web')
+            ->withHeaders([
+                'Origin' => 'http://localhost:5173',
+                'Referer' => 'http://localhost:5173/',
+                'Accept' => 'application/json',
+            ])
+            ->putJson('/api/v1/auth/password', [
+                'current_password' => 'OldPass123!',
+                'password' => 'NewSecurePass123!',
+                'password_confirmation' => 'NewSecurePass123!',
+            ]);
+
+        $okRes->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'message' => 'Password updated successfully.',
+            ]);
+
+        $this->assertTrue(Hash::check('NewSecurePass123!', $user->fresh()->password));
+    }
 }

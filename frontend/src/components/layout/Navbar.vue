@@ -155,26 +155,29 @@ onUnmounted(() => {
           </router-link>
         </template>
 
-        <!-- Authenticated User Profile -->
+        <!-- Authenticated User Profile Icon -->
         <template v-else>
-          <div class="profile-avatar-wrapper">
-            <router-link
-              to="/profile"
-              class="user-profile-trigger"
-              :title="`${authStore.userName} — Open Profile`"
-              :aria-label="`Open ${authStore.userName} profile`"
+          <router-link
+            to="/profile"
+            class="circle-action-btn profile-icon-btn"
+            :title="`${authStore.userName} — My Profile`"
+            :aria-label="`Open ${authStore.userName} profile`"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
-              <div class="user-avatar-pill">
-                <img
-                  v-if="authStore.userAvatar"
-                  :src="authStore.userAvatar"
-                  :alt="authStore.userName"
-                  class="avatar-img"
-                />
-                <span v-else class="avatar-fallback">{{ userInitials }}</span>
-              </div>
-            </router-link>
-          </div>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </router-link>
         </template>
 
         <!-- Mobile Hamburger Button -->
@@ -443,6 +446,16 @@ onUnmounted(() => {
 
 .circle-action-btn:active {
   transform: scale(0.95);
+}
+
+.profile-icon-btn {
+  text-decoration: none;
+}
+
+.profile-icon-btn.router-link-active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .nav-signin-link {
