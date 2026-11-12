@@ -109,10 +109,6 @@ async function handleLogout() {
         <!-- Wide Animated Cover Banner -->
         <div class="profile-cover" aria-label="Smart parking cover illustration">
           <ProfileParkingAnimation />
-          <div class="cover-top-badge">
-            <span class="live-dot"></span>
-            <span>PARKLY DASHBOARD</span>
-          </div>
         </div>
 
         <!-- Identity Section Sitting Cleanly Below Cover -->
@@ -397,39 +393,6 @@ async function handleLogout() {
   height: 268px;
   overflow: hidden;
   border-bottom: 1px solid var(--color-border);
-}
-
-.cover-top-badge {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--color-text);
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid var(--color-border);
-  backdrop-filter: blur(8px);
-}
-
-:global([data-theme='dark']) .cover-top-badge {
-  color: #e2e8f0;
-  background: rgba(11, 18, 32, 0.78);
-  border-color: rgba(148, 163, 184, 0.22);
-}
-
-.live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  box-shadow: 0 0 8px var(--color-primary);
 }
 
 /* Identity Panel cleanly below Cover */
@@ -955,13 +918,6 @@ async function handleLogout() {
 
   .profile-cover {
     height: 175px;
-  }
-
-  .cover-top-badge {
-    top: 12px;
-    right: 12px;
-    padding: 4px 10px;
-    font-size: 9px;
   }
 
   .identity-panel {

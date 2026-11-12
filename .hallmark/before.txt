@@ -1,0 +1,213 @@
+FAIL 4 frontend\src\views\ProfileView.vue:946 card nested in card: class="theme-option-card" | fix: Keep one containment layer
+FAIL 4 frontend\src\views\ProfileView.vue:963 card nested in card: class="theme-option-card" | fix: Keep one containment layer
+FAIL 10a frontend\src\views\ProfileView.vue:1608 transition: all on .pill-tab | fix: List the transitioned properties explicitly
+FAIL 19 frontend\src\views\ProfileView.vue:758 dash "—" in copy | fix: A comma, a colon, a full stop or parentheses; never a dash
+FAIL 19 frontend\src\views\ProfileView.vue:896 buzzword "unlock" | fix: Say what the product does, in its own nouns
+FAIL 26a frontend\src\views\ProfileView.vue:1 no :focus-visible styling anywhere | fix: A focus ring at 3:1 or better, instant
+FAIL 27 frontend\src\views\ProfileView.vue:1391 motion present, no prefers-reduced-motion block | fix: Add a prefers-reduced-motion fallback
+FAIL 33 frontend\src\views\ProfileView.vue:460 <svg> without aria-hidden or aria-label | fix: Add aria-hidden or an aria-label
+FAIL 33 frontend\src\views\ProfileView.vue:475 <svg> without aria-hidden or aria-label | fix: Add aria-hidden or an aria-label
+FAIL 48 frontend\src\views\ProfileView.vue:1332 colour literal #f1f5f9 outside tokens (color on .profile-page.is-dark .cover-…) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1333 colour literal rgba(11, 18, 32, 0.85) outside tokens (background on .profile-page.is-dark .cover-…) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1334 colour literal rgba(148, 163, 184, 0.28) outside tokens (border-color on .profile-page.is-dark .cover-…) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1339 colour literal #f1f5f9 outside tokens (color on :global(:root:not([data-theme…) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1340 colour literal rgba(11, 18, 32, 0.85) outside tokens (background on :global(:root:not([data-theme…) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1341 colour literal rgba(148, 163, 184, 0.28) outside tokens (border-color on :global(:root:not([data-theme…) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1385 colour literal rgba(20, 184, 166, 0.5) outside tokens (border on .avatar-orbit-ring) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1403 colour literal #0f172a outside tokens (background on .avatar-large) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1404 colour literal #ffffff outside tokens (color on .avatar-large) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1411 colour literal rgba(15, 118, 110, 0.28) outside tokens (box-shadow on .avatar-large) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1417 colour literal rgba(15, 118, 110, 0.36) outside tokens (box-shadow on .avatar-large:hover) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1437 colour literal #ffffff outside tokens (color on .avatar-camera) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1439 colour literal rgba(0, 0, 0, 0.2) outside tokens (box-shadow on .avatar-camera) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1531 colour literal #94a3b8 outside tokens (background on .status-pill i) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1535 colour literal #059669 outside tokens (color on .status-pill.active) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1536 colour literal rgba(5, 150, 105, 0.28) outside tokens (border-color on .status-pill.active) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1537 colour literal rgba(16, 185, 129, 0.1) outside tokens (background on .status-pill.active) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1541 colour literal #10b981 outside tokens (background on .status-pill.active i) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1668 colour literal #0b1220 outside tokens (background on .member-pass-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1668 colour literal #13253e outside tokens (background on .member-pass-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1668 colour literal #0d4b4a outside tokens (background on .member-pass-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1669 colour literal #f8fafc outside tokens (color on .member-pass-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1674 colour literal rgba(11, 18, 32, 0.35) outside tokens (box-shadow on .member-pass-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1680 colour literal rgba(15, 118, 110, 0.38) outside tokens (box-shadow on .member-pass-card:hover) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1689 colour literal rgba(94, 234, 212, 0.22) outside tokens (background on .pass-foil-sheen) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1689 colour literal rgba(20, 184, 166, 0.06) outside tokens (background on .pass-foil-sheen) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1731 colour literal #14b8a6 outside tokens (background on .pass-chip) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1731 colour literal #0f766e outside tokens (background on .pass-chip) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1732 colour literal #ffffff outside tokens (color on .pass-chip) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1737 colour literal rgba(20, 184, 166, 0.35) outside tokens (box-shadow on .pass-chip) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1745 colour literal #5eead4 outside tokens (color on .pass-eyebrow) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1752 colour literal #e2e8f0 outside tokens (color on .pass-tier) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1764 colour literal rgba(255, 255, 255, 0.1) outside tokens (background on .pass-toggle-btn) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1765 colour literal rgba(255, 255, 255, 0.2) outside tokens (border on .pass-toggle-btn) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1766 colour literal #e2e8f0 outside tokens (color on .pass-toggle-btn) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1774 colour literal rgba(20, 184, 166, 0.24) outside tokens (background on .pass-toggle-btn:hover) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1775 colour literal #14b8a6 outside tokens (border-color on .pass-toggle-btn:hover) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1784 colour literal rgba(255, 255, 255, 0.08) outside tokens (background on .pass-status-dot) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1785 colour literal rgba(255, 255, 255, 0.16) outside tokens (border on .pass-status-dot) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1789 colour literal #cbd5e1 outside tokens (color on .pass-status-dot) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1796 colour literal #94a3b8 outside tokens (background on .pass-status-dot i) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1800 colour literal #34d399 outside tokens (background on .pass-status-dot.active i) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1801 colour literal #34d399 outside tokens (box-shadow on .pass-status-dot.active i) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1813 colour literal #94a3b8 outside tokens (color on .pass-label) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1821 colour literal #ffffff outside tokens (color on .pass-holder-name) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1828 colour literal #cbd5e1 outside tokens (color on .pass-holder-email) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1847 colour literal #f8fafc outside tokens (color on .pass-meta-group strong) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1856 colour literal #14b8a6 outside tokens (background on .pass-cta) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1857 colour literal #0b1220 outside tokens (color on .pass-cta) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1865 colour literal #2dd4bf outside tokens (background on .pass-cta:hover) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1878 colour literal rgba(255, 255, 255, 0.05) outside tokens (background on .pass-gate-preview) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1879 colour literal rgba(94, 234, 212, 0.35) outside tokens (border on .pass-gate-preview) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1888 colour literal rgba(11, 18, 32, 0.65) outside tokens (background on .gate-qr-frame) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1899 colour literal #ffffff outside tokens (color on .gate-preview-copy h3) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1905 colour literal #cbd5e1 outside tokens (color on .gate-preview-copy p) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1952 colour literal rgba(99, 102, 241, 0.12) outside tokens (background on .dock-icon.indigo) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:1953 colour literal #6366f1 outside tokens (color on .dock-icon.indigo) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2145 colour literal #94a3b8 outside tokens (background on .check-dot) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2149 colour literal #10b981 outside tokens (background on .check-dot.ok) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2150 colour literal rgba(16, 185, 129, 0.45) outside tokens (box-shadow on .check-dot.ok) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2372 colour literal #0b1220 outside tokens (background on .live-sync-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2372 colour literal #13253e outside tokens (background on .live-sync-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2372 colour literal #0e3d3f outside tokens (background on .live-sync-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2373 colour literal #f8fafc outside tokens (color on .live-sync-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2374 colour literal rgba(20, 184, 166, 0.25) outside tokens (border on .live-sync-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2375 colour literal rgba(11, 18, 32, 0.45) outside tokens (box-shadow on .live-sync-card) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2387 colour literal #5eead4 outside tokens (color on .sync-header .card-kicker) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2399 colour literal rgba(16, 185, 129, 0.14) outside tokens (background on .sync-badge) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2400 colour literal #34d399 outside tokens (color on .sync-badge) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2407 colour literal #34d399 outside tokens (background on .sync-badge i) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2411 colour literal rgba(245, 158, 11, 0.18) outside tokens (background on .sync-badge.dirty) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2412 colour literal #fbbf24 outside tokens (color on .sync-badge.dirty) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2416 colour literal #fbbf24 outside tokens (background on .sync-badge.dirty i) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2430 colour literal #14b8a6 outside tokens (background on .sync-avatar) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2430 colour literal #0f766e outside tokens (background on .sync-avatar) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2431 colour literal rgba(94, 234, 212, 0.45) outside tokens (border on .sync-avatar) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2437 colour literal #ffffff outside tokens (color on .sync-avatar) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2464 colour literal #ffffff outside tokens (color on .sync-text strong) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2469 colour literal #cbd5e1 outside tokens (color on .sync-text small) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2475 colour literal #5eead4 outside tokens (color on .sync-phone) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2484 colour literal rgba(255, 255, 255, 0.1) outside tokens (border-top on .sync-footer-pills) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2538 colour literal #f8fafc outside tokens (background on .light-ui) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2539 colour literal #e2e8f0 outside tokens (border on .light-ui) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2543 colour literal #0b1220 outside tokens (background on .dark-ui) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2544 colour literal #26364c outside tokens (border on .dark-ui) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2557 colour literal #0f172a outside tokens (color on .light-ui .mini-bar, .light-u…) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2562 colour literal #f1f5f9 outside tokens (color on .dark-ui .mini-bar, .dark-ui …) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2577 colour literal #14b8a6 outside tokens (background on .mini-accent) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2632 colour literal rgba(99, 102, 241, 0.12) outside tokens (background on .studio-icon.indigo) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2633 colour literal #6366f1 outside tokens (color on .studio-icon.indigo) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2664 colour literal #1e293b outside tokens (background on .well-avatar) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2665 colour literal #ffffff outside tokens (color on .well-avatar) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2726 colour literal rgba(16, 185, 129, 0.12) outside tokens (background on .form-banner.success) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2727 colour literal rgba(16, 185, 129, 0.3) outside tokens (border on .form-banner.success) | fix: Lift the value into the token block
+FAIL 48 frontend\src\views\ProfileView.vue:2728 colour literal #10b981 outside tokens (color on .form-banner.success) | fix: Lift the value into the token block
+FAIL 50 frontend\src\views\ProfileView.vue:2356 bare 1fr track holds images (.settings-studio) | fix: Use minmax(0, 1fr) for image tracks
+FAIL 50 frontend\src\views\ProfileView.vue:2861 bare 1fr track holds images (.activity-split, .settings-studio, .kpi-placeholder-row) | fix: Use minmax(0, 1fr) for image tracks
+FAIL 54 frontend\src\views\ProfileView.vue:581 eyebrow "REGISTERED PASS HOLDER" before <h2> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:628 eyebrow "AUTOMATED GATE CHECK-IN" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:702 eyebrow "ACTIVE SESSION RADAR" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:718 eyebrow "ACCOUNT SETUP" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:751 eyebrow "BOOKING TELEMETRY" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:774 eyebrow "PERSONAL INSIGHTS" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:815 eyebrow "PARKING TIMELINE" before <h2> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:827 eyebrow "STREAM CAPABILITIES" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:892 eyebrow "REAL-TIME INSIGHTS" before <h2> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:942 eyebrow "APPEARANCE" before <h4> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:996 eyebrow "IDENTITY STUDIO" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:1154 eyebrow "SECURITY VAULT" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 54 frontend\src\views\ProfileView.vue:1262 eyebrow "ACTIVE SANCTUM SESSION" before <h3> | fix: Cut it; the heading already says this (craft.md § 7 has twelve other openings)
+FAIL 63 frontend\src\views\ProfileView.vue:708 arrow glued to the label "Browse verified garages →" (<router-link>) | fix: A verb as the label; the link already says it goes somewhere
+FAIL 67 frontend\src\views\ProfileView.vue:406 "PARKLY MOBILITY COCKPIT" typed in capitals at 10px tracked 0.14em (<div class="cover-top-badge">) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+FAIL 67 frontend\src\views\ProfileView.vue:408 "PARKLY MOBILITY COCKPIT" typed in capitals at 11px (<span>) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+FAIL 67 frontend\src\views\ProfileView.vue:560 "PARKLY DIGITAL GATE PASS" typed in capitals at 11px tracked 0.16em (<span class="pass-eyebrow">) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+FAIL 67 frontend\src\views\ProfileView.vue:581 "REGISTERED PASS HOLDER" typed in capitals at 11px tracked 0.14em (<span class="pass-label">) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+FAIL 67 frontend\src\views\ProfileView.vue:698 "STANDBY" typed in capitals at 11px tracked 0.12em (<span class="standby-chip">) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+FAIL 67 frontend\src\views\ProfileView.vue:704 "ACTIVE SESSION RADAR" typed in capitals at 11px tracked 0.14em (<span class="eyebrow">) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+FAIL 67 frontend\src\views\ProfileView.vue:718 "ACCOUNT SETUP" typed in capitals at 13px tracked 0.14em (<p class="card-kicker">) | fix: Sentence case in the body face; capitals survive only as a wordmark or as the display voice
+FAIL 67 frontend\src\views\ProfileView.vue:1311 .cover-top-badge: letter-spaced tracked 0.14em at 10px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+FAIL 67 frontend\src\views\ProfileView.vue:1470 .eyebrow, .card-kicker: uppercase tracked 0.14em at 11px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+FAIL 67 frontend\src\views\ProfileView.vue:1740 .pass-eyebrow: letter-spaced tracked 0.16em at 10px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+FAIL 67 frontend\src\views\ProfileView.vue:1778 .pass-status-dot: letter-spaced tracked 0.12em at 10px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+FAIL 67 frontend\src\views\ProfileView.vue:1808 .pass-label: letter-spaced tracked 0.14em at 10px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+FAIL 67 frontend\src\views\ProfileView.vue:2026 .standby-chip: letter-spaced tracked 0.12em at 10px in a label role | fix: Labels, captions, table heads, nav links and meta are the body face (or the theme's label face), a step smaller, sentence case, untracked
+REFLEX 24b frontend\src\views\ProfileView.vue:1319 padding: 7px 14px (off the 4px scale) on .cover-top-badge | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1354 padding: 22px 32px 18px (off the 4px scale) on .identity-panel | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1363 padding-bottom: 22px (off the 4px scale) on .identity-main | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1454 gap: 7px (off the 4px scale) on .eyebrow-row | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1455 margin-bottom: 6px (off the 4px scale) on .eyebrow-row | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1513 gap: 6px (off the 4px scale) on .role-pill, .status-pill, .verified-pill | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1559 gap: 10px (off the 4px scale) on .identity-actions | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1588 gap: 6px (off the 4px scale) on .pill-tabs | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1589 padding: 5px (off the 4px scale) on .pill-tabs | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1598 gap: 7px (off the 4px scale) on .pill-tab | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1631 margin-top: 26px (off the 4px scale) on .profile-main | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1644 gap: 18px (off the 4px scale) on .cockpit-left-rail | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1651 gap: 18px (off the 4px scale) on .cockpit-right-rail | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1667 padding: 28px 30px (off the 4px scale) on .member-pass-card | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1762 padding: 5px 11px (off the 4px scale) on .pass-toggle-btn | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1781 gap: 7px (off the 4px scale) on .pass-status-dot | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1782 padding: 5px 12px (off the 4px scale) on .pass-status-dot | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1854 padding: 10px 18px (off the 4px scale) on .pass-cta | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1874 gap: 22px (off the 4px scale) on .pass-gate-preview | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1875 margin-top: 22px (off the 4px scale) on .pass-gate-preview | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1876 padding: 18px (off the 4px scale) on .pass-gate-preview | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1897 margin: 2px 0 6px (off the 4px scale) on .gate-preview-copy h3 | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1913 gap: 14px (off the 4px scale) on .quick-dock-grid | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:1920 padding: 16px 18px (off the 4px scale) on .quick-dock-tile | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2030 padding: 4px 10px (off the 4px scale) on .standby-chip | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2038 margin: 0 0 6px (off the 4px scale) on .session-copy h3 | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2043 margin: 0 0 14px (off the 4px scale) on .session-copy p | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2052 gap: 6px (off the 4px scale) on .card-action-link | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2078 gap: 14px (off the 4px scale) on .readiness-header | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2124 gap: 10px (off the 4px scale) on .readiness-list | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2130 gap: 3px (off the 4px scale) on .readiness-list li | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2131 padding: 10px 12px (off the 4px scale) on .readiness-list li | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2187 margin-bottom: 14px (off the 4px scale) on .telemetry-empty-stage | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2202 padding: 4px 10px (off the 4px scale) on .empty-tag | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2247 margin: 18px 0 0 (off the 4px scale) on .capability-list | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2250 gap: 14px (off the 4px scale) on .capability-list | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2257 padding: 14px (off the 4px scale) on .capability-list li | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2265 margin-top: 6px (off the 4px scale) on .cap-dot | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2332 margin-bottom: 18px (off the 4px scale) on .empty-icon-ring | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2338 margin: 4px 0 10px (off the 4px scale) on .editorial-empty-card h2 | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2357 gap: 22px (off the 4px scale) on .settings-studio | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2364 gap: 18px (off the 4px scale) on .settings-rail | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2371 padding: 22px (off the 4px scale) on .live-sync-card | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2383 margin-bottom: 18px (off the 4px scale) on .sync-header | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2394 gap: 6px (off the 4px scale) on .sync-badge | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2395 padding: 4px 10px (off the 4px scale) on .sync-badge | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2422 gap: 14px (off the 4px scale) on .sync-identity-row | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2423 margin-bottom: 18px (off the 4px scale) on .sync-identity-row | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2476 margin-top: 3px (off the 4px scale) on .sync-phone | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2483 padding-top: 14px (off the 4px scale) on .sync-footer-pills | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2496 margin: 0 0 14px (off the 4px scale) on .studio-head-mini h4 | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2503 gap: 10px (off the 4px scale) on .theme-picker-grid | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2510 padding: 10px (off the 4px scale) on .theme-option-card | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2531 padding: 7px (off the 4px scale) on .theme-mini-ui | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2534 gap: 5px (off the 4px scale) on .theme-mini-ui | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2607 gap: 14px (off the 4px scale) on .studio-card-header | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2614 gap: 14px (off the 4px scale) on .studio-title-group | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2646 padding: 14px 16px (off the 4px scale) on .avatar-studio-well | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2650 margin-bottom: 18px (off the 4px scale) on .avatar-studio-well | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2656 gap: 14px (off the 4px scale) on .well-left | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2717 gap: 10px (off the 4px scale) on .form-banner | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2718 padding: 11px 14px (off the 4px scale) on .form-banner | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2722 margin-bottom: 14px (off the 4px scale) on .form-banner | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2741 padding: 13px 16px (off the 4px scale) on .readonly-meta-strip | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2767 gap: 14px (off the 4px scale) on .studio-save-footer | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2768 padding-top: 14px (off the 4px scale) on .studio-save-footer | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2828 gap: 14px (off the 4px scale) on .profile-loading | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2875 padding: 18px 22px 16px (off the 4px scale) on .identity-panel | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2881 gap: 18px (off the 4px scale) on .identity-main | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2937 padding: 4px 10px (off the 4px scale) on .cover-top-badge | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2942 padding: 16px 16px 14px (off the 4px scale) on .identity-panel | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2952 margin-top: -42px (off the 4px scale) on .avatar-wrap | fix: Use the 4px spacing scale
+REFLEX 24b frontend\src\views\ProfileView.vue:2967 padding: 22px 20px (off the 4px scale) on .member-pass-card | fix: Use the 4px spacing scale
+REFLEX 26b frontend\src\views\ProfileView.vue:1 no :active styling anywhere | fix: All eight states; guard: not a form control, no aria-disabled anywhere
+REFLEX 26b frontend\src\views\ProfileView.vue:1 no :disabled styling anywhere | fix: All eight states; guard: not a form control, no aria-disabled anywhere
+WARN 41 frontend\src\views\ProfileView.vue:2543 dark surface (L 18%) on .dark-ui sets no text colour | fix: Swap text to paper in the same rule
+WARN 49 frontend\src\views\ProfileView.vue:565 long clickable label "{{ showPassDetails ? 'Front Card' :…" without nowrap | fix: Shorten the label or set nowrap
+WARN 49 frontend\src\views\ProfileView.vue:666 long clickable label "Update Photo Preview avatar +" without nowrap | fix: Shorten the label or set nowrap
+WARN F2 frontend\src\views\ProfileView.vue:398 three-period ellipsis in prose x1 | fix: Use a true ellipsis character (…)
+WARN F3 frontend\src\views\ProfileView.vue:1481 no text-wrap: balance on any display head (2 head rule(s), e.g. .identity-copy h1) | fix: Add text-wrap: balance to h1/h2-level heads
