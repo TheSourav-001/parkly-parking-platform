@@ -403,10 +403,6 @@ async function handleLogout() {
       <header class="profile-hero-card">
         <div class="profile-cover" aria-label="Smart parking cover illustration">
           <ProfileParkingAnimation />
-          <div class="cover-top-badge">
-            <span class="live-dot"></span>
-            <span>PARKLY MOBILITY COCKPIT</span>
-          </div>
         </div>
 
         <div class="identity-panel">
@@ -1308,48 +1304,7 @@ async function handleLogout() {
   border-bottom: 1px solid var(--color-border);
 }
 
-.cover-top-badge {
-  position: absolute;
-  top: 18px;
-  right: 20px;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--color-text);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-}
-
-.profile-page.is-dark .cover-top-badge,
-:global([data-theme='dark']) .cover-top-badge {
-  color: #f1f5f9;
-  background: rgba(11, 18, 32, 0.85);
-  border-color: rgba(148, 163, 184, 0.28);
-}
-
-@media (prefers-color-scheme: dark) {
-  :global(:root:not([data-theme='light'])) .cover-top-badge {
-    color: #f1f5f9;
-    background: rgba(11, 18, 32, 0.85);
-    border-color: rgba(148, 163, 184, 0.28);
-  }
-}
-
-.live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  box-shadow: 0 0 8px var(--color-primary);
-}
-
+/* Identity Panel cleanly below Cover */
 .identity-panel {
   padding: 22px 32px 18px;
   background: var(--color-surface);
@@ -2929,13 +2884,6 @@ async function handleLogout() {
 
   .profile-cover {
     height: 196px;
-  }
-
-  .cover-top-badge {
-    top: 10px;
-    right: 12px;
-    padding: 4px 10px;
-    font-size: 8.5px;
   }
 
   .identity-panel {

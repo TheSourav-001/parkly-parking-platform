@@ -405,9 +405,9 @@ function handleGoogleSignUp() {
           />
           <span class="terms-text">
             I agree to the
-            <a href="#terms" target="_blank" class="auth-link">Terms</a>
+            <router-link to="/terms" target="_blank" class="auth-link">Terms</router-link>
             and
-            <a href="#privacy" target="_blank" class="auth-link">Privacy Policy</a>.
+            <router-link to="/privacy" target="_blank" class="auth-link">Privacy Policy</router-link>.
           </span>
         </label>
         <p v-if="errors.agreeToTerms" class="error-text" role="alert">

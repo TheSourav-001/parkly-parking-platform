@@ -77,10 +77,10 @@ const selectedRegion = ref('Bangladesh (EN)')
         <div class="footer-column">
           <h3 class="column-header">LEGAL & COMPLIANCE</h3>
           <ul class="column-links">
-            <li><a href="#privacy">Privacy Policy</a></li>
-            <li><a href="#terms">Terms of Service</a></li>
+            <li><router-link to="/privacy">Privacy Policy</router-link></li>
+            <li><router-link to="/terms">Terms of Service</router-link></li>
             <li><a href="#cookies">Cookie Preferences</a></li>
-            <li><a href="#refunds">Cancellation Policy</a></li>
+            <li><router-link to="/terms#cancellation">Cancellation Policy</router-link></li>
             <li><a href="#help">Help Center & FAQ</a></li>
           </ul>
         </div>
