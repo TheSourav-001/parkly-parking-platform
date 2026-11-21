@@ -1,8 +1,8 @@
 <script setup>
 /**
  * Main Application Shell for Parkly Frontend
- * Renders the unified floating pill Navbar on all routes (home, auth, profile)
- * and renders the dark editorial Footer on standard routes.
+ * Renders the unified Navbar across all routes
+ * and Footer on standard routes.
  */
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -11,10 +11,12 @@ import Footer from './components/layout/Footer.vue'
 
 const route = useRoute()
 const router = useRouter()
+
 const isAuthRoute = computed(() => Boolean(route.meta && route.meta.isAuth))
 
 function scrollOrNavigate(targetId) {
   const el = document.getElementById(targetId)
+
   if (el) {
     el.scrollIntoView({ behavior: 'smooth' })
   } else {
@@ -33,13 +35,11 @@ function handleNavigate(targetId) {
 
 <template>
   <div class="parkly-app" :class="{ 'is-auth-view': isAuthRoute }">
-    <!-- Unified Home-Style Floating Pill Navbar across all pages -->
     <Navbar
       @openSearch="handleOpenSearch"
       @navigate="handleNavigate"
     />
 
-    <!-- Main Content Area with Router View -->
     <main class="content-container">
       <router-view v-slot="{ Component }">
         <transition name="page-fade" mode="out-in">
@@ -48,7 +48,6 @@ function handleNavigate(targetId) {
       </router-view>
     </main>
 
-    <!-- Marketing Footer is hidden on authentication routes -->
     <Footer v-if="!isAuthRoute" />
   </div>
 </template>
@@ -76,7 +75,6 @@ function handleNavigate(targetId) {
   flex-direction: column;
 }
 
-/* Smooth, modern page transition */
 .page-fade-enter-active,
 .page-fade-leave-active {
   transition: opacity var(--transition-fast), transform var(--transition-fast);
