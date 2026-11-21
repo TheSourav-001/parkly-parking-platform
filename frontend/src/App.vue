@@ -8,6 +8,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Navbar from './components/layout/Navbar.vue'
 import Footer from './components/layout/Footer.vue'
+import AppSplashScreen from './components/common/AppSplashScreen.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,6 +36,9 @@ function handleNavigate(targetId) {
 
 <template>
   <div class="parkly-app" :class="{ 'is-auth-view': isAuthRoute }">
+    <!-- App Entrance / Refresh Loading Animation -->
+    <AppSplashScreen />
+
     <Navbar
       @openSearch="handleOpenSearch"
       @navigate="handleNavigate"

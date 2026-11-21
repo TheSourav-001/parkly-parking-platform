@@ -10,6 +10,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import AppButton from '../common/AppButton.vue'
 import { useAuthStore } from '../../stores/auth'
+import logoUrl from '../../assets/logo.png'
 
 defineProps({
   activeSection: {
@@ -85,14 +86,7 @@ onUnmounted(() => {
       <!-- Brand Logo -->
       <router-link to="/" class="brand-group" aria-label="Parkly Home" @click="closeMobileMenu">
         <div class="brand-symbol" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="symbol-svg">
-            <rect width="32" height="32" rx="10" fill="currentColor" class="symbol-bg" />
-            <path
-              d="M10 23V9h6.2a4.8 4.8 0 0 1 4.8 4.8v.4a4.8 4.8 0 0 1-4.8 4.8H14v4h-4zm4-7.8h2.2a1.8 1.8 0 0 0 1.8-1.8v-.4a1.8 1.8 0 0 0-1.8-1.8H14v4z"
-              fill="#FFFFFF"
-              class="symbol-letter"
-            />
-          </svg>
+          <img :src="logoUrl" alt="Parkly Logo" class="brand-logo-img" />
           <span class="symbol-orbit-dot" aria-hidden="true"></span>
         </div>
         <div class="brand-text">
@@ -342,10 +336,20 @@ onUnmounted(() => {
   position: relative;
   width: 32px;
   height: 32px;
-  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform var(--transition-fast);
+}
+
+.brand-group:hover .brand-logo-img {
+  transform: scale(1.06);
 }
 
 .symbol-svg {
