@@ -16,6 +16,12 @@ const routes = [
     meta: { title: 'Parkly — Discover & Book Smart Parking', isAuth: false },
   },
   {
+    path: '/find-parking',
+    name: 'find-parking',
+    component: () => import('../views/FindParkingView.vue'),
+    meta: { title: 'Find Parking — Parkly', isAuth: false },
+  },
+  {
     path: '/profile',
     name: 'profile',
     component: ProfileView,
@@ -62,7 +68,7 @@ const router = createRouter({
   routes,
   scrollBehavior(to) {
     if (to.hash) {
-      return { el: to.hash, behavior: 'smooth', top: 96 }
+      return { el: to.hash, behavior: 'smooth', top: 110 }
     }
     return { top: 0 }
   },

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ParkingFacilityController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,11 @@ Route::get('/health-check', function () {
         'status' => 'healthy',
         'platform' => 'Parkly API',
     ]);
+});
+
+Route::prefix('v1')->group(function () {
+    Route::get('/facilities', [ParkingFacilityController::class, 'index']);
+    Route::get('/facilities/{id}', [ParkingFacilityController::class, 'show']);
 });
 
 Route::prefix('v1/auth')->group(function () {

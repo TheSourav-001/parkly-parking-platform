@@ -52,7 +52,13 @@ function handleSectionNav(sectionId) {
   if (route.path === '/') {
     const el = document.getElementById(sectionId)
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
+      const navOffset = 110
+      const elementPosition = el.getBoundingClientRect().top + window.pageYOffset
+      const offsetPosition = elementPosition - navOffset
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
     }
     emit('navigate', sectionId)
   } else {
