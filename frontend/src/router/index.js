@@ -6,6 +6,8 @@ import RegisterView from '../views/auth/RegisterView.vue'
 import ForgotPasswordView from '../views/auth/ForgotPasswordView.vue'
 import ResetPasswordView from '../views/auth/ResetPasswordView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import TermsView from '../views/legal/TermsView.vue'
+import PrivacyView from '../views/legal/PrivacyView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const routes = [
@@ -50,6 +52,18 @@ const routes = [
     name: 'reset-password',
     component: ResetPasswordView,
     meta: { title: 'Reset Password — Parkly', isAuth: true, guestOnly: true },
+  },
+  {
+    path: '/terms',
+    name: 'terms',
+    component: TermsView,
+    meta: { title: 'Terms of Service — Parkly', isAuth: false },
+  },
+  {
+    path: '/privacy',
+    name: 'privacy',
+    component: PrivacyView,
+    meta: { title: 'Privacy Policy — Parkly', isAuth: false },
   },
   {
     path: '/:pathMatch(.*)*',
