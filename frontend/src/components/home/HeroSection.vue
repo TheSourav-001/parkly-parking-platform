@@ -193,7 +193,7 @@ onBeforeUnmount(() => {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         class="parking-canvas-svg"
-        preserveAspectRatio="xMidYMid slice"
+        preserveAspectRatio="xMaxYMax slice"
       >
         <defs>
           <!-- Sky gradient — uses CSS custom properties for theme awareness -->
@@ -607,19 +607,19 @@ onBeforeUnmount(() => {
         <!-- ======== 4 STRAIGHT ROUTES FOR CARS 1 TO 4 ======== -->
         <!-- Circuit 1 -> straight to P-04 (x=644) -->
         <path class="circuit-bg circuit-bg-1" d="M 280,323 L 620,323 Q 644,323 644,345 L 644,400" fill="none" stroke="var(--hero-bay-stroke)" stroke-width="2.2" stroke-dasharray="5 8" opacity="0.35" />
-        <path class="circuit circuit-1" d="M 280,323 L 620,323 Q 644,323 644,345 L 644,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#route-glow)" />
+        <path class="circuit circuit-1" d="M 280,323 L 620,323 Q 644,323 644,345 L 644,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Circuit 2 -> straight to P-05 (x=724) -->
         <path class="circuit-bg circuit-bg-2" d="M 280,323 L 700,323 Q 724,323 724,345 L 724,400" fill="none" stroke="var(--hero-bay-stroke)" stroke-width="2.2" stroke-dasharray="5 8" opacity="0.35" />
-        <path class="circuit circuit-2" d="M 280,323 L 700,323 Q 724,323 724,345 L 724,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#route-glow)" />
+        <path class="circuit circuit-2" d="M 280,323 L 700,323 Q 724,323 724,345 L 724,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Circuit 3 -> straight to P-06 (x=804) -->
         <path class="circuit-bg circuit-bg-3" d="M 280,323 L 780,323 Q 804,323 804,345 L 804,400" fill="none" stroke="var(--hero-bay-stroke)" stroke-width="2.2" stroke-dasharray="5 8" opacity="0.35" />
-        <path class="circuit circuit-3" d="M 280,323 L 780,323 Q 804,323 804,345 L 804,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#route-glow)" />
+        <path class="circuit circuit-3" d="M 280,323 L 780,323 Q 804,323 804,345 L 804,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Circuit 4 -> straight to P-07 (x=888) -->
         <path class="circuit-bg circuit-bg-4" d="M 280,323 L 864,323 Q 888,323 888,345 L 888,400" fill="none" stroke="var(--hero-bay-stroke)" stroke-width="2.2" stroke-dasharray="5 8" opacity="0.35" />
-        <path class="circuit circuit-4" d="M 280,323 L 864,323 Q 888,323 888,345 L 888,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#route-glow)" />
+        <path class="circuit circuit-4" d="M 280,323 L 864,323 Q 888,323 888,345 L 888,400" fill="none" stroke="var(--color-primary)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- ======== 4 ANIMATED VEHICLES ======== -->
         <!-- Car 1 (Parks in P-04) -->
@@ -830,7 +830,8 @@ onBeforeUnmount(() => {
 
   position: relative;
   width: 100%;
-  min-height: 520px;
+  min-height: clamp(480px, 60vh, 560px);
+  max-height: 640px;
   overflow: hidden;
   background-color: var(--color-bg);
 }
@@ -1019,7 +1020,7 @@ onBeforeUnmount(() => {
 .hero-overlay-content {
   position: relative;
   z-index: 3;
-  padding: 56px 24px 100px;
+  padding: clamp(36px, 5vh, 52px) 24px clamp(40px, 6vh, 68px);
 }
 
 .hero-container {
@@ -1030,8 +1031,8 @@ onBeforeUnmount(() => {
 .hero-content {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 520px;
+  gap: clamp(14px, 2vh, 20px);
+  max-width: clamp(420px, 42vw, 500px);
 }
 
 .hero-eyebrow {
@@ -1053,20 +1054,20 @@ onBeforeUnmount(() => {
 }
 
 .hero-headline {
-  font-size: clamp(2.4rem, 4.5vw, 3.85rem);
-  font-weight: 500;
-  line-height: 1.08;
+  font-size: clamp(2rem, 3.4vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1.1;
   letter-spacing: -0.03em;
   color: var(--color-text);
   margin: 0;
 }
 
 .hero-description {
-  font-size: clamp(1rem, 1.3vw, 1.18rem);
+  font-size: clamp(0.925rem, 1.15vw, 1.08rem);
   font-weight: 450;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--color-text-muted);
-  max-width: 480px;
+  max-width: 460px;
   margin: 0;
 }
 
@@ -1301,8 +1302,13 @@ onBeforeUnmount(() => {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1024px) {
+  .hero-section {
+    min-height: 520px;
+    max-height: 580px;
+  }
+
   .hero-overlay-content {
-    padding: 48px 24px 120px;
+    padding: 40px 20px 60px;
   }
 
   .hero-content {
@@ -1325,17 +1331,23 @@ onBeforeUnmount(() => {
 
 @media (max-width: 768px) {
   .hero-section {
-    min-height: 600px;
+    min-height: auto;
+    max-height: none;
+    padding-bottom: 24px;
   }
 
   .hero-overlay-content {
-    padding: 36px 16px 160px;
+    padding: 32px 16px 36px;
   }
 
   .hero-content {
     max-width: 100%;
     text-align: center;
     align-items: center;
+  }
+
+  .hero-description {
+    max-width: 520px;
   }
 
   .hero-ctas {
@@ -1351,8 +1363,8 @@ onBeforeUnmount(() => {
     background: linear-gradient(
       180deg,
       var(--color-bg) 0%,
-      rgba(248, 250, 252, 0.85) 35%,
-      rgba(248, 250, 252, 0.4) 65%,
+      rgba(248, 250, 252, 0.9) 45%,
+      rgba(248, 250, 252, 0.6) 75%,
       transparent 100%
     );
   }
@@ -1361,8 +1373,8 @@ onBeforeUnmount(() => {
     background: linear-gradient(
       180deg,
       var(--color-bg) 0%,
-      rgba(11, 18, 32, 0.85) 35%,
-      rgba(11, 18, 32, 0.4) 65%,
+      rgba(11, 18, 32, 0.9) 45%,
+      rgba(11, 18, 32, 0.6) 75%,
       transparent 100%
     );
   }
@@ -1394,11 +1406,36 @@ onBeforeUnmount(() => {
 
 @media (max-width: 480px) {
   .hero-section {
-    min-height: 560px;
+    min-height: auto;
   }
 
   .hero-overlay-content {
-    padding: 28px 12px 170px;
+    padding: 24px 12px 28px;
+  }
+
+  .hero-ctas {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .cta-primary,
+  .cta-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-stats {
+    width: 100%;
+    justify-content: space-around;
+    gap: 8px;
+  }
+
+  .stat-number {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.6875rem;
   }
 
   .hero-bottom-elements {
