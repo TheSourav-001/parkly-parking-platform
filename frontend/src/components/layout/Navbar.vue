@@ -10,6 +10,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ThemeToggle from '../common/ThemeToggle.vue'
 import AppButton from '../common/AppButton.vue'
 import { useAuthStore } from '../../stores/auth'
+import logoUrl from '../../assets/logo.png'
 
 defineProps({
   activeSection: {
@@ -91,14 +92,7 @@ onUnmounted(() => {
       <!-- Brand Logo -->
       <router-link to="/" class="brand-group" aria-label="Parkly Home" @click="closeMobileMenu">
         <div class="brand-symbol" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="symbol-svg">
-            <rect width="32" height="32" rx="10" fill="currentColor" class="symbol-bg" />
-            <path
-              d="M10 23V9h6.2a4.8 4.8 0 0 1 4.8 4.8v.4a4.8 4.8 0 0 1-4.8 4.8H14v4h-4zm4-7.8h2.2a1.8 1.8 0 0 0 1.8-1.8v-.4a1.8 1.8 0 0 0-1.8-1.8H14v4z"
-              fill="#FFFFFF"
-              class="symbol-letter"
-            />
-          </svg>
+          <img :src="logoUrl" alt="Parkly Logo" class="brand-logo-img" />
           <span class="symbol-orbit-dot" aria-hidden="true"></span>
         </div>
         <div class="brand-text">
@@ -161,26 +155,29 @@ onUnmounted(() => {
           </router-link>
         </template>
 
-        <!-- Authenticated User Profile -->
+        <!-- Authenticated User Profile Icon -->
         <template v-else>
-          <div class="profile-avatar-wrapper">
-            <router-link
-              to="/profile"
-              class="user-profile-trigger"
-              :title="`${authStore.userName} — Open Profile`"
-              :aria-label="`Open ${authStore.userName} profile`"
+          <router-link
+            to="/profile"
+            class="circle-action-btn profile-icon-btn"
+            :title="`${authStore.userName} — My Profile`"
+            :aria-label="`Open ${authStore.userName} profile`"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
-              <div class="user-avatar-pill">
-                <img
-                  v-if="authStore.userAvatar"
-                  :src="authStore.userAvatar"
-                  :alt="authStore.userName"
-                  class="avatar-img"
-                />
-                <span v-else class="avatar-fallback">{{ userInitials }}</span>
-              </div>
-            </router-link>
-          </div>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </router-link>
         </template>
 
         <!-- Mobile Hamburger Button -->
@@ -345,10 +342,20 @@ onUnmounted(() => {
   position: relative;
   width: 32px;
   height: 32px;
-  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform var(--transition-fast);
+}
+
+.brand-group:hover .brand-logo-img {
+  transform: scale(1.06);
 }
 
 .symbol-svg {
@@ -449,6 +456,16 @@ onUnmounted(() => {
 
 .circle-action-btn:active {
   transform: scale(0.95);
+}
+
+.profile-icon-btn {
+  text-decoration: none;
+}
+
+.profile-icon-btn.router-link-active {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .nav-signin-link {

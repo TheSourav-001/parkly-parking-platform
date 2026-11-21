@@ -1,19 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\ParkingFacilityController;
+use App\Http\Controllers\Api\VehicleTypeController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group.
-|
-*/
+// Health check
+Route::get('/health', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'Parkly API is running successfully.',
+    ]);
+});
 
 Route::get('/health-check', function () {
     return response()->json([
@@ -22,11 +21,17 @@ Route::get('/health-check', function () {
     ]);
 });
 
+// Homepage and Location APIs
+Route::get('/locations', [LocationController::class, 'index']);
+Route::get('/vehicle-types', [VehicleTypeController::class, 'index']);
+
+// Parking Facilities API
 Route::prefix('v1')->group(function () {
     Route::get('/facilities', [ParkingFacilityController::class, 'index']);
     Route::get('/facilities/{id}', [ParkingFacilityController::class, 'show']);
 });
 
+// Authentication APIs
 Route::prefix('v1/auth')->group(function () {
     // Public authentication routes
     Route::post('/register', [AuthController::class, 'register']);
@@ -37,6 +42,8 @@ Route::prefix('v1/auth')->group(function () {
     // Protected authentication routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
+        Route::match(['put', 'patch'], '/profile', [AuthController::class, 'updateProfile']);
+        Route::put('/password', [AuthController::class, 'updatePassword']);
         Route::post('/logout', [AuthController::class, 'logout']);
     });
 });

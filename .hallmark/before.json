@@ -1,0 +1,95 @@
+{
+ "v": 1,
+ "at": "2026-11-12T09:52:10.025Z",
+ "scope": "app",
+ "summary": {
+  "fails": 133,
+  "reflex": 75,
+  "warns": 5
+ },
+ "files": {
+  "frontend\\src\\views\\ProfileView.vue": {
+   "handlers": [
+    "@change=\"handleAvatarChange\"",
+    "@click.stop=\"showPassDetails = !showPassDetails\"",
+    "@click=\"activeTab = tab.id\"",
+    "@click=\"chooseAvatar\"",
+    "@click=\"clearAvatarPreview\"",
+    "@click=\"handleLogout\"",
+    "@click=\"setTheme('dark')\"",
+    "@click=\"setTheme('light')\"",
+    "@click=\"showCurrentPwd = !showCurrentPwd\"",
+    "@click=\"showNewPwd = !showNewPwd\"",
+    "@click=\"syncProfileFormFromUser\"",
+    "@mouseleave=\"handlePassPointerLeave\"",
+    "@mousemove=\"handlePassPointerMove\"",
+    "@submit.prevent=\"handleSaveProfile\"",
+    "@submit.prevent=\"handleUpdatePassword\""
+   ],
+   "links": [
+    "/#discovery",
+    "/#featured"
+   ],
+   "fields": [
+    "Full name is required",
+    "Name must be at least 2 characters"
+   ],
+   "hooks": [],
+   "ids": [
+    "activity-panel",
+    "analytics-panel",
+    "overview-panel",
+    "settings-confirm-pwd",
+    "settings-current-pwd",
+    "settings-email",
+    "settings-name",
+    "settings-new-pwd",
+    "settings-panel",
+    "settings-phone"
+   ],
+   "scripts": []
+  }
+ },
+ "wiring": {
+  "handlers": [
+   "@change=\"handleAvatarChange\"",
+   "@click.stop=\"showPassDetails = !showPassDetails\"",
+   "@click=\"activeTab = tab.id\"",
+   "@click=\"chooseAvatar\"",
+   "@click=\"clearAvatarPreview\"",
+   "@click=\"handleLogout\"",
+   "@click=\"setTheme('dark')\"",
+   "@click=\"setTheme('light')\"",
+   "@click=\"showCurrentPwd = !showCurrentPwd\"",
+   "@click=\"showNewPwd = !showNewPwd\"",
+   "@click=\"syncProfileFormFromUser\"",
+   "@mouseleave=\"handlePassPointerLeave\"",
+   "@mousemove=\"handlePassPointerMove\"",
+   "@submit.prevent=\"handleSaveProfile\"",
+   "@submit.prevent=\"handleUpdatePassword\""
+  ],
+  "links": [
+   "/#discovery",
+   "/#featured"
+  ],
+  "fields": [
+   "Full name is required",
+   "Name must be at least 2 characters"
+  ],
+  "hooks": [],
+  "ids": [
+   "activity-panel",
+   "analytics-panel",
+   "overview-panel",
+   "settings-confirm-pwd",
+   "settings-current-pwd",
+   "settings-email",
+   "settings-name",
+   "settings-new-pwd",
+   "settings-panel",
+   "settings-phone"
+  ]
+ },
+ "scripts": {},
+ "pages": {}
+}

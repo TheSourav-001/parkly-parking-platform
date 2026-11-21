@@ -5,6 +5,7 @@
  * social links, copyright, and country/language pill selector.
  */
 import { ref } from 'vue'
+import logoUrl from '../../assets/logo.png'
 
 const currentYear = new Date().getFullYear()
 const selectedRegion = ref('Bangladesh (EN)')
@@ -77,10 +78,10 @@ const selectedRegion = ref('Bangladesh (EN)')
         <div class="footer-column">
           <h3 class="column-header">LEGAL & COMPLIANCE</h3>
           <ul class="column-links">
-            <li><a href="#privacy">Privacy Policy</a></li>
-            <li><a href="#terms">Terms of Service</a></li>
+            <li><router-link to="/privacy">Privacy Policy</router-link></li>
+            <li><router-link to="/terms">Terms of Service</router-link></li>
             <li><a href="#cookies">Cookie Preferences</a></li>
-            <li><a href="#refunds">Cancellation Policy</a></li>
+            <li><router-link to="/terms#cancellation">Cancellation Policy</router-link></li>
             <li><a href="#help">Help Center & FAQ</a></li>
           </ul>
         </div>
@@ -93,13 +94,7 @@ const selectedRegion = ref('Bangladesh (EN)')
       <div class="footer-bottom">
         <div class="bottom-brand-group">
           <div class="mini-logo" aria-hidden="true">
-            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
-              <rect width="32" height="32" rx="8" fill="var(--color-primary)" />
-              <path
-                d="M10 23V9h6.2a4.8 4.8 0 0 1 4.8 4.8v.4a4.8 4.8 0 0 1-4.8 4.8H14v4h-4zm4-7.8h2.2a1.8 1.8 0 0 0 1.8-1.8v-.4a1.8 1.8 0 0 0-1.8-1.8H14v4z"
-                fill="#FFFFFF"
-              />
-            </svg>
+            <img :src="logoUrl" alt="Parkly Logo" class="footer-logo-img" />
           </div>
           <span class="copyright-text">
             &copy; {{ currentYear }} Parkly Technologies Inc. All rights reserved.
@@ -309,6 +304,15 @@ const selectedRegion = ref('Bangladesh (EN)')
 .mini-logo {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.footer-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .copyright-text {
