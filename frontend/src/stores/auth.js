@@ -118,6 +118,56 @@ export const useAuthStore = defineStore('auth', {
     },
 
     /**
+     * Update authenticated user's profile information (name, email, phone).
+     */
+    async updateProfile(payload) {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        await ensureCsrf()
+        const response = await api.put('/api/v1/auth/profile', {
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone || null,
+        })
+
+        if (response.data?.data?.user) {
+          this.user = response.data.data.user
+        }
+        return response.data
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Failed to update profile.'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * Update authenticated user's password.
+     */
+    async updatePassword(payload) {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        await ensureCsrf()
+        const response = await api.put('/api/v1/auth/password', {
+          current_password: payload.current_password,
+          password: payload.password,
+          password_confirmation: payload.password_confirmation,
+        })
+        return response.data
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Failed to update password.'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
      * Logout user and invalidate backend session.
      */
     async logout() {

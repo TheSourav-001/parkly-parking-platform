@@ -7,6 +7,8 @@ use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\UpdatePasswordRequest;
+use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
@@ -134,6 +136,57 @@ class AuthController extends Controller
             'data' => [
                 'user' => $this->sanitizeUser($user),
             ],
+        ], 200);
+    }
+
+    /**
+     * Update the currently authenticated user's basic profile information.
+     */
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $validated = $request->validated();
+
+        $emailChanged = $validated['email'] !== $user->email;
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->phone = array_key_exists('phone', $validated) && $validated['phone'] !== ''
+            ? $validated['phone']
+            : null;
+
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully.',
+            'data' => [
+                'user' => $this->sanitizeUser($user),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Update the currently authenticated user's password.
+     */
+    public function updatePassword(UpdatePasswordRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $validated = $request->validated();
+
+        $user->password = $validated['password'];
+        $user->setRememberToken(Str::random(60));
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password updated successfully.',
         ], 200);
     }
 

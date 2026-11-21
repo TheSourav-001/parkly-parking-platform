@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 /**
- * Centralized Axios API instance for Parkly
- * Configured specifically for Laravel Sanctum SPA cookie-based session authentication.
+ * Centralized Axios API instance for Parkly.
+ * Configured for Laravel Sanctum SPA authentication.
  */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
@@ -15,12 +15,9 @@ const api = axios.create({
   },
 })
 
-// Track CSRF initialization state to avoid unnecessary redundant calls
+// CSRF initialization
 let csrfPromise = null
 
-/**
- * Ensures a valid Sanctum CSRF cookie is present before state-changing requests.
- */
 export async function ensureCsrf() {
   if (!csrfPromise) {
     csrfPromise = api.get('/sanctum/csrf-cookie').catch((err) => {
@@ -28,15 +25,46 @@ export async function ensureCsrf() {
       throw err
     })
   }
+
   return csrfPromise
 }
 
-/**
- * Reset CSRF promise tracker (e.g. after logout or session invalidation)
- */
+// Reset CSRF tracker
 export function resetCsrf() {
   csrfPromise = null
 }
 
-export default api
+/**
+ * Helper for Location and Vehicle Type APIs.
+ */
+async function request(endpoint) {
+  const response = await api.get(`/api${endpoint}`)
+  const result = response.data
 
+  if (!response.data || !response.data.success) {
+    throw new Error(result?.message || 'Something went wrong.')
+  }
+
+  return result.data
+}
+
+// Location APIs
+export const getDivisions = () => {
+  return request('/locations?type=division')
+}
+
+export const getDistricts = (divisionId) => {
+  return request(`/locations?type=district&parent_id=${encodeURIComponent(divisionId)}`)
+}
+
+export const getUpazilas = (districtId) => {
+  return request(`/locations?type=thana&parent_id=${encodeURIComponent(districtId)}`)
+}
+
+// Vehicle Type API
+export const getVehicleTypes = () => {
+  return request('/vehicle-types')
+}
+
+// Default Axios export for Authentication and other API requests
+export default api
