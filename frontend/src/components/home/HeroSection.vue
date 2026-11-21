@@ -15,7 +15,7 @@
  * 6. Pauses for ~2 seconds.
  * 7. Smoothly resets and restarts.
  */
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 import { animate, createTimeline, svg } from 'animejs'
 import AppButton from '../common/AppButton.vue'
 
@@ -24,31 +24,7 @@ defineEmits(['explore', 'howItWorks'])
 let activeTimeline = null
 let activeAnimations = []
 
-const currentViewBox = ref('0 0 1200 480')
-const currentPreserveAspect = ref('xMaxYMid slice')
-
-const updateViewBox = () => {
-  if (typeof window === 'undefined') return
-  const w = window.innerWidth
-  if (w <= 640) {
-    // Mobile: Frame sky (Sun/Moon), entrance gate + target stalls P-04..P-07 + aisle
-    currentViewBox.value = '265 40 675 430'
-    currentPreserveAspect.value = 'xMidYMid meet'
-  } else if (w <= 900) {
-    // Tablet: Frame sky, entire facility from gate to P-08
-    currentViewBox.value = '255 40 780 430'
-    currentPreserveAspect.value = 'xMidYMid meet'
-  } else {
-    // Desktop & Windows: Full panoramic view anchored to right
-    currentViewBox.value = '0 0 1200 480'
-    currentPreserveAspect.value = 'xMaxYMid slice'
-  }
-}
-
 onMounted(() => {
-  updateViewBox()
-  window.addEventListener('resize', updateViewBox, { passive: true })
-
   const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   if (prefersReduced) {
@@ -183,8 +159,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateViewBox)
-
   if (activeTimeline) {
     try {
       if (typeof activeTimeline.pause === 'function') activeTimeline.pause()
@@ -215,11 +189,11 @@ onBeforeUnmount(() => {
          ===================================================================== -->
     <div class="hero-parking-canvas" aria-hidden="true">
       <svg
-        :viewBox="currentViewBox"
+        viewBox="0 0 1200 480"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         class="parking-canvas-svg"
-        :preserveAspectRatio="currentPreserveAspect"
+        preserveAspectRatio="xMidYMid slice"
       >
         <defs>
           <!-- Sky gradient — uses CSS custom properties for theme awareness -->
@@ -251,34 +225,6 @@ onBeforeUnmount(() => {
           <!-- Subtle route glow filter -->
           <filter id="route-glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="2" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-
-          <!-- Sun core gradient -->
-          <radialGradient id="sun-core-gradient" cx="35%" cy="35%" r="65%">
-            <stop offset="0%" stop-color="#FFFBEB" />
-            <stop offset="35%" stop-color="#FEF08A" />
-            <stop offset="75%" stop-color="#FBBF24" />
-            <stop offset="100%" stop-color="#F59E0B" />
-          </radialGradient>
-
-          <!-- Moon core gradient -->
-          <radialGradient id="moon-core-gradient" cx="35%" cy="35%" r="65%">
-            <stop offset="0%" stop-color="#FFFFFF" />
-            <stop offset="40%" stop-color="#F0F9FF" />
-            <stop offset="80%" stop-color="#BAE6FD" />
-            <stop offset="100%" stop-color="#7DD3FC" />
-          </radialGradient>
-
-          <!-- Sun glow filter -->
-          <filter id="sun-glow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="16" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-
-          <!-- Moon soft glow filter -->
-          <filter id="moon-glow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="14" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
 
@@ -315,53 +261,11 @@ onBeforeUnmount(() => {
           <circle cx="620" cy="12" r="0.8" fill="white" opacity="0.5" />
         </g>
 
-        <!-- ======== CELESTIAL SYSTEM: GLOWING SUN (Day) & GLOWING MOON (Night) ======== -->
-        <g class="celestial-system">
-          <!-- GLOWING SUN (Visible in Light Mode) -->
-          <g class="celestial-sun" transform="translate(850, 80)">
-            <!-- Radiant outer sun aura & ambient glow -->
-            <circle cx="0" cy="0" r="68" fill="#FBBF24" opacity="0.25" filter="url(#sun-glow)" />
-            <circle cx="0" cy="0" r="48" fill="#FDE68A" opacity="0.5" filter="url(#sun-glow)" />
-            <!-- Radiating rotating sun rays -->
-            <g stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" opacity="0.75" class="sun-rays">
-              <line x1="0" y1="-34" x2="0" y2="-46" />
-              <line x1="24" y1="-24" x2="33" y2="-33" />
-              <line x1="34" y1="0" x2="46" y2="0" />
-              <line x1="24" y1="24" x2="33" y2="33" />
-              <line x1="0" y1="34" x2="0" y2="46" />
-              <line x1="-24" y1="24" x2="-33" y2="33" />
-              <line x1="-34" y1="0" x2="-46" y2="0" />
-              <line x1="-24" y1="-24" x2="-33" y2="-33" />
-            </g>
-            <!-- Core glowing sun disc -->
-            <circle cx="0" cy="0" r="26" fill="url(#sun-core-gradient)" />
-            <circle cx="-5" cy="-5" r="19" fill="#FFFBEB" opacity="0.6" />
-          </g>
-
-          <!-- GLOWING MOON (Visible in Dark Mode with gentle celestial glow) -->
-          <g class="celestial-moon" transform="translate(850, 80)">
-            <!-- Soft ambient moonlight aura -->
-            <circle cx="0" cy="0" r="64" fill="#38BDF8" opacity="0.22" filter="url(#moon-glow)" />
-            <circle cx="0" cy="0" r="44" fill="#BAE6FD" opacity="0.38" filter="url(#moon-glow)" />
-            <!-- Soft luminous moon disc -->
-            <circle cx="0" cy="0" r="24" fill="url(#moon-core-gradient)" />
-            <!-- Soft crescent shade giving realistic 3D lunar look -->
-            <path d="M -12,-20 A 24,24 0 0,0 16,18 A 21,21 0 0,1 -12,-20 Z" fill="#0284C7" opacity="0.12" />
-            <!-- Delicate lunar craters -->
-            <circle cx="-6" cy="-5" r="3.2" fill="#64748B" opacity="0.28" />
-            <circle cx="5" cy="6" r="4.8" fill="#64748B" opacity="0.22" />
-            <circle cx="8" cy="-7" r="2.8" fill="#64748B" opacity="0.25" />
-            <circle cx="-2" cy="11" r="2" fill="#64748B" opacity="0.18" />
-            <!-- Moonlight rim highlight -->
-            <circle cx="-3" cy="-3" r="22" fill="none" stroke="#F0F9FF" stroke-width="1.4" opacity="0.8" />
-          </g>
-        </g>
-
         <!-- ======== BACKGROUND BUILDINGS (Far skyline) ======== -->
         <g class="skyline-buildings">
           <!-- Building 1 — Tall residential tower (far left) -->
           <rect x="60" y="110" width="65" height="170" rx="3" fill="var(--hero-building-far)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
             <rect x="70" y="120" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="84" y="120" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="100" y="120" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
@@ -379,7 +283,7 @@ onBeforeUnmount(() => {
 
           <!-- Building 2 — Mid-height office (left-center) -->
           <rect x="145" y="160" width="55" height="120" rx="3" fill="var(--hero-building-mid)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
             <rect x="153" y="170" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="165" y="170" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="179" y="170" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
@@ -395,7 +299,7 @@ onBeforeUnmount(() => {
 
           <!-- Building 3 — Commercial block (far right) -->
           <rect x="1020" y="130" width="70" height="150" rx="3" fill="var(--hero-building-far)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
             <rect x="1030" y="140" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1045" y="140" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1060" y="140" width="8" height="10" rx="1" fill="var(--hero-window-glow)" />
@@ -413,7 +317,7 @@ onBeforeUnmount(() => {
 
           <!-- Building 4 — Apartment (right-center) -->
           <rect x="1110" y="170" width="50" height="110" rx="3" fill="var(--hero-building-mid)" stroke="var(--hero-building-stroke)" stroke-width="0.8" />
-          <g class="building-windows" opacity="var(--hero-window-light-opacity)" stroke="var(--hero-window-stroke)" stroke-width="0.7">
+          <g class="building-windows" opacity="var(--hero-window-light-opacity)">
             <rect x="1118" y="180" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1132" y="180" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
             <rect x="1146" y="180" width="7" height="9" rx="1" fill="var(--hero-window-glow)" />
@@ -427,53 +331,29 @@ onBeforeUnmount(() => {
 
         <!-- ======== TREES (between buildings and parking) ======== -->
         <g class="landscape-trees">
-          <!-- Tree cluster left (Enlarged) -->
-          <circle cx="50" cy="250" r="26" fill="var(--hero-tree-fill)" />
-          <circle cx="32" cy="262" r="20" fill="var(--hero-tree-fill-dark)" />
-          <rect x="45" y="268" width="9" height="20" rx="2" fill="var(--hero-trunk)" />
+          <!-- Tree cluster left -->
+          <circle cx="50" cy="260" r="18" fill="var(--hero-tree-fill)" />
+          <circle cx="38" cy="268" r="14" fill="var(--hero-tree-fill-dark)" />
+          <rect x="46" y="274" width="8" height="14" rx="2" fill="var(--hero-trunk)" />
 
-          <circle cx="138" cy="254" r="23" fill="var(--hero-tree-fill)" />
-          <circle cx="124" cy="264" r="17" fill="var(--hero-tree-fill-dark)" />
-          <rect x="133" y="270" width="8" height="18" rx="2" fill="var(--hero-trunk)" />
+          <circle cx="135" cy="265" r="15" fill="var(--hero-tree-fill)" />
+          <circle cx="128" cy="272" r="12" fill="var(--hero-tree-fill-dark)" />
+          <rect x="131" y="276" width="7" height="12" rx="2" fill="var(--hero-trunk)" />
 
-          <!-- Tree cluster right (Enlarged) -->
-          <circle cx="1000" cy="248" r="25" fill="var(--hero-tree-fill)" />
-          <circle cx="1018" cy="258" r="19" fill="var(--hero-tree-fill-dark)" />
-          <rect x="995" y="266" width="9" height="22" rx="2" fill="var(--hero-trunk)" />
+          <!-- Tree cluster right -->
+          <circle cx="1000" cy="258" r="17" fill="var(--hero-tree-fill)" />
+          <circle cx="1012" cy="266" r="13" fill="var(--hero-tree-fill-dark)" />
+          <rect x="996" y="272" width="8" height="14" rx="2" fill="var(--hero-trunk)" />
 
-          <circle cx="1106" cy="252" r="23" fill="var(--hero-tree-fill)" />
-          <circle cx="1092" cy="262" r="17" fill="var(--hero-tree-fill-dark)" />
-          <rect x="1101" y="268" width="8" height="20" rx="2" fill="var(--hero-trunk)" />
-
-          <!-- 3 NEW ROADSIDE TREES (Along the street & curb) -->
-          <!-- Roadside Tree 1 (Left avenue tree near gate) -->
-          <g class="roadside-tree roadside-tree-1">
-            <ellipse cx="208" cy="286" rx="14" ry="4" fill="var(--hero-curb)" opacity="0.6" />
-            <rect x="204" y="268" width="7" height="18" rx="2" fill="var(--hero-trunk)" />
-            <circle cx="208" cy="250" r="20" fill="var(--hero-tree-fill)" />
-            <circle cx="198" cy="258" r="15" fill="var(--hero-tree-fill-dark)" />
-          </g>
-
-          <!-- Roadside Tree 2 (Mid-driveway avenue tree) -->
-          <g class="roadside-tree roadside-tree-2">
-            <ellipse cx="325" cy="286" rx="14" ry="4" fill="var(--hero-curb)" opacity="0.6" />
-            <rect x="321" y="268" width="7" height="18" rx="2" fill="var(--hero-trunk)" />
-            <circle cx="325" cy="250" r="20" fill="var(--hero-tree-fill)" />
-            <circle cx="334" cy="258" r="15" fill="var(--hero-tree-fill-dark)" />
-          </g>
-
-          <!-- Roadside Tree 3 (Right avenue tree near exit) -->
-          <g class="roadside-tree roadside-tree-3">
-            <ellipse cx="955" cy="286" rx="14" ry="4" fill="var(--hero-curb)" opacity="0.6" />
-            <rect x="951" y="268" width="7" height="18" rx="2" fill="var(--hero-trunk)" />
-            <circle cx="955" cy="250" r="21" fill="var(--hero-tree-fill)" />
-            <circle cx="964" cy="258" r="15" fill="var(--hero-tree-fill-dark)" />
-          </g>
+          <circle cx="1100" cy="262" r="14" fill="var(--hero-tree-fill)" />
+          <circle cx="1092" cy="268" r="11" fill="var(--hero-tree-fill-dark)" />
+          <rect x="1096" y="274" width="7" height="12" rx="2" fill="var(--hero-trunk)" />
 
           <!-- Small bushes -->
-          <ellipse cx="240" cy="278" rx="14" ry="9" fill="var(--hero-tree-fill-dark)" opacity="0.75" />
-          <ellipse cx="925" cy="278" rx="15" ry="9" fill="var(--hero-tree-fill-dark)" opacity="0.75" />
+          <ellipse cx="240" cy="278" rx="12" ry="8" fill="var(--hero-tree-fill-dark)" opacity="0.7" />
+          <ellipse cx="960" cy="276" rx="14" ry="9" fill="var(--hero-tree-fill-dark)" opacity="0.7" />
         </g>
+
         <!-- ======== GROUND / ROAD SURFACE ======== -->
         <rect x="0" y="280" width="1200" height="200" fill="url(#ground-gradient)" />
 
@@ -909,10 +789,6 @@ onBeforeUnmount(() => {
   --hero-sky-bottom: #D4E8F5;
   --hero-cloud-opacity: 1;
   --hero-star-opacity: 0;
-  --hero-sun-opacity: 1;
-  --hero-sun-scale: 1;
-  --hero-moon-opacity: 0;
-  --hero-moon-scale: 0.85;
 
   --hero-ground-top: #D1D5DB;
   --hero-ground-bottom: #C8CCD2;
@@ -924,9 +800,8 @@ onBeforeUnmount(() => {
   --hero-building-far: #CBD5E1;
   --hero-building-mid: #D6DDE6;
   --hero-building-stroke: #B0B9C5;
-  --hero-window-glow: #BAE6FD;
-  --hero-window-stroke: #38BDF8;
-  --hero-window-light-opacity: 0.95;
+  --hero-window-glow: transparent;
+  --hero-window-light-opacity: 0;
 
   --hero-tree-fill: #4ADE80;
   --hero-tree-fill-dark: #22C55E;
@@ -955,8 +830,7 @@ onBeforeUnmount(() => {
 
   position: relative;
   width: 100%;
-  min-height: 500px;
-  max-height: 580px;
+  min-height: 520px;
   overflow: hidden;
   background-color: var(--color-bg);
 }
@@ -968,10 +842,6 @@ onBeforeUnmount(() => {
   --hero-sky-bottom: #101B2C;
   --hero-cloud-opacity: 0;
   --hero-star-opacity: 1;
-  --hero-sun-opacity: 0;
-  --hero-sun-scale: 0.85;
-  --hero-moon-opacity: 1;
-  --hero-moon-scale: 1;
 
   --hero-ground-top: #111C2E;
   --hero-ground-bottom: #0D1726;
@@ -984,7 +854,6 @@ onBeforeUnmount(() => {
   --hero-building-mid: #1A293F;
   --hero-building-stroke: #26364C;
   --hero-window-glow: #FDE68A;
-  --hero-window-stroke: #F59E0B;
   --hero-window-light-opacity: 0.85;
 
   --hero-tree-fill: #166534;
@@ -1021,10 +890,6 @@ onBeforeUnmount(() => {
     --hero-sky-bottom: #101B2C;
     --hero-cloud-opacity: 0;
     --hero-star-opacity: 1;
-    --hero-sun-opacity: 0;
-    --hero-sun-scale: 0.85;
-    --hero-moon-opacity: 1;
-    --hero-moon-scale: 1;
 
     --hero-ground-top: #111C2E;
     --hero-ground-bottom: #0D1726;
@@ -1037,7 +902,6 @@ onBeforeUnmount(() => {
     --hero-building-mid: #1A293F;
     --hero-building-stroke: #26364C;
     --hero-window-glow: #FDE68A;
-    --hero-window-stroke: #F59E0B;
     --hero-window-light-opacity: 0.85;
 
     --hero-tree-fill: #166534;
@@ -1091,33 +955,6 @@ onBeforeUnmount(() => {
 }
 
 /* Transition theme-aware SVG properties smoothly */
-/* Celestial system transitions & sun ray rotation */
-.celestial-sun {
-  opacity: var(--hero-sun-opacity, 1);
-  transform: scale(var(--hero-sun-scale, 1));
-  transform-origin: 850px 80px;
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-}
-
-.celestial-moon {
-  opacity: var(--hero-moon-opacity, 0);
-  transform: scale(var(--hero-moon-scale, 0.85));
-  transform-origin: 850px 80px;
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-}
-
-@keyframes sun-ray-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.sun-rays {
-  transform-origin: 0 0;
-  animation: sun-ray-spin 48s linear infinite;
-}
-
 .parking-canvas-svg rect,
 .parking-canvas-svg circle,
 .parking-canvas-svg line,
@@ -1137,13 +974,14 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 0;
   left: 0;
-  width: 46%;
+  width: 55%;
   height: 100%;
   background: linear-gradient(
     90deg,
     var(--color-bg) 0%,
-    var(--color-bg) 35%,
-    rgba(248, 250, 252, 0.75) 65%,
+    var(--color-bg) 30%,
+    rgba(248, 250, 252, 0.85) 55%,
+    rgba(248, 250, 252, 0.4) 75%,
     transparent 100%
   );
   pointer-events: none;
@@ -1155,8 +993,9 @@ onBeforeUnmount(() => {
   background: linear-gradient(
     90deg,
     var(--color-bg) 0%,
-    var(--color-bg) 35%,
-    rgba(11, 18, 32, 0.75) 65%,
+    var(--color-bg) 30%,
+    rgba(11, 18, 32, 0.85) 55%,
+    rgba(11, 18, 32, 0.4) 75%,
     transparent 100%
   );
 }
@@ -1166,8 +1005,9 @@ onBeforeUnmount(() => {
     background: linear-gradient(
       90deg,
       var(--color-bg) 0%,
-      var(--color-bg) 35%,
-      rgba(11, 18, 32, 0.75) 65%,
+      var(--color-bg) 30%,
+      rgba(11, 18, 32, 0.85) 55%,
+      rgba(11, 18, 32, 0.4) 75%,
       transparent 100%
     );
   }
@@ -1179,7 +1019,7 @@ onBeforeUnmount(() => {
 .hero-overlay-content {
   position: relative;
   z-index: 3;
-  padding: clamp(36px, 4vw, 52px) 24px clamp(44px, 5vw, 64px);
+  padding: 56px 24px 100px;
 }
 
 .hero-container {
@@ -1190,8 +1030,8 @@ onBeforeUnmount(() => {
 .hero-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-width: 480px;
+  gap: 20px;
+  max-width: 520px;
 }
 
 .hero-eyebrow {
@@ -1213,29 +1053,29 @@ onBeforeUnmount(() => {
 }
 
 .hero-headline {
-  font-size: clamp(2.1rem, 3.5vw, 3.5rem);
-  font-weight: 600;
-  line-height: 1.12;
+  font-size: clamp(2.4rem, 4.5vw, 3.85rem);
+  font-weight: 500;
+  line-height: 1.08;
   letter-spacing: -0.03em;
   color: var(--color-text);
   margin: 0;
 }
 
 .hero-description {
-  font-size: clamp(0.925rem, 1.15vw, 1.1rem);
-  font-weight: 400;
-  line-height: 1.5;
+  font-size: clamp(1rem, 1.3vw, 1.18rem);
+  font-weight: 450;
+  line-height: 1.55;
   color: var(--color-text-muted);
-  max-width: 460px;
+  max-width: 480px;
   margin: 0;
 }
 
 .hero-ctas {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .cta-primary {
@@ -1255,8 +1095,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-top: 6px;
-  padding-top: 18px;
+  margin-top: 10px;
+  padding-top: 20px;
   border-top: 1px solid var(--color-border);
 }
 
@@ -1285,6 +1125,160 @@ onBeforeUnmount(() => {
   background-color: var(--color-border);
 }
 
+/* ============================================================
+   BOTTOM FLOATING ELEMENTS — Pass + Card + Arrow
+   ============================================================ */
+.hero-bottom-elements {
+  position: absolute;
+  bottom: 20px;
+  left: 24px;
+  right: 24px;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.hero-bottom-elements > * {
+  pointer-events: auto;
+}
+
+/* Digital Pass (lower-left) */
+.hero-pass-float {
+  flex-shrink: 0;
+}
+
+.pass-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--color-surface);
+  box-shadow: var(--shadow-halo);
+  transition: transform var(--transition-smooth);
+}
+
+.pass-circle:hover {
+  transform: translateY(-3px);
+}
+
+.pass-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Card group (card + arrow) */
+.hero-card-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.floating-availability-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill, 999px);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-card-elevated);
+  backdrop-filter: blur(8px);
+}
+
+.card-pulse-indicator {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-success);
+}
+
+.live-ping {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  opacity: 0.5;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 0.78125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.card-detail {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+}
+
+.card-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill, 999px);
+  background-color: rgba(22, 163, 74, 0.12);
+  color: var(--color-success);
+  letter-spacing: 0.05em;
+}
+
+/* Circular Arrow CTA */
+.satellite-cta {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-elevation);
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.satellite-cta:hover {
+  transform: scale(1.08) rotate(-6deg);
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  text-decoration: none;
+}
+
 /* Animation targets */
 .car {
   transform-origin: 0 0;
@@ -1304,22 +1298,38 @@ onBeforeUnmount(() => {
 }
 
 /* ============================================================
-   RESPONSIVE — TABLET & MOBILE
+   RESPONSIVE
    ============================================================ */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
+  .hero-overlay-content {
+    padding: 48px 24px 120px;
+  }
+
+  .hero-content {
+    max-width: 440px;
+  }
+
+  .hero-canvas-overlay {
+    width: 60%;
+  }
+
+  .hero-bottom-elements {
+    bottom: 16px;
+  }
+
+  .pass-circle {
+    width: 110px;
+    height: 110px;
+  }
+}
+
+@media (max-width: 768px) {
   .hero-section {
-    display: flex;
-    flex-direction: column;
-    min-height: auto;
-    max-height: none;
-    overflow: visible;
+    min-height: 600px;
   }
 
   .hero-overlay-content {
-    order: 1;
-    position: relative;
-    padding: 32px 20px 20px;
-    z-index: 2;
+    padding: 36px 16px 160px;
   }
 
   .hero-content {
@@ -1328,79 +1338,82 @@ onBeforeUnmount(() => {
     align-items: center;
   }
 
-  .hero-description {
-    max-width: 540px;
-  }
-
   .hero-ctas {
     justify-content: center;
   }
 
   .hero-stats {
     justify-content: center;
-  }
-
-  .hero-parking-canvas {
-    order: 2;
-    position: relative;
-    width: calc(100% - 32px);
-    max-width: 720px;
-    margin: 8px auto 36px;
-    aspect-ratio: 675 / 380;
-    height: auto;
-    border-radius: 18px;
-    border: 1px solid var(--color-border);
-    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-  }
-
-  :root[data-theme='dark'] .hero-parking-canvas {
-    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
   }
 
   .hero-canvas-overlay {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero-overlay-content {
-    padding: 24px 16px 16px;
-  }
-
-  .hero-parking-canvas {
-    width: calc(100% - 24px);
-    margin: 6px auto 28px;
-    border-radius: 14px;
-    aspect-ratio: 675 / 380;
-  }
-
-  .hero-ctas {
-    flex-direction: column;
     width: 100%;
-    gap: 10px;
+    background: linear-gradient(
+      180deg,
+      var(--color-bg) 0%,
+      rgba(248, 250, 252, 0.85) 35%,
+      rgba(248, 250, 252, 0.4) 65%,
+      transparent 100%
+    );
   }
 
-  .cta-primary,
-  .cta-secondary {
-    width: 100%;
+  :root[data-theme='dark'] .hero-canvas-overlay {
+    background: linear-gradient(
+      180deg,
+      var(--color-bg) 0%,
+      rgba(11, 18, 32, 0.85) 35%,
+      rgba(11, 18, 32, 0.4) 65%,
+      transparent 100%
+    );
+  }
+
+  .hero-bottom-elements {
+    bottom: 12px;
+    left: 16px;
+    right: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
     justify-content: center;
   }
 
-  .hero-stats {
-    gap: 12px;
-    padding-top: 16px;
-    margin-top: 6px;
-    width: 100%;
-    justify-content: space-around;
+  .pass-circle {
+    width: 95px;
+    height: 95px;
   }
 
-  .stat-number {
-    font-size: 1.1rem;
+  .floating-availability-card {
+    padding: 6px 12px;
+    gap: 8px;
   }
 
-  .stat-label {
-    font-size: 0.6875rem;
+  .satellite-cta {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    min-height: 560px;
+  }
+
+  .hero-overlay-content {
+    padding: 28px 12px 170px;
+  }
+
+  .hero-bottom-elements {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-card-group {
+    gap: 8px;
+  }
+
+  .pass-circle {
+    width: 80px;
+    height: 80px;
   }
 }
 </style>

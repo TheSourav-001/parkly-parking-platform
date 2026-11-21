@@ -29,19 +29,18 @@ function handleScrollTo(id) {
 }
 
 function handleSearch(params) {
-  activeFeedback.value = `Searching parking near "${params.location}" for ${params.vehicle} (${params.duration} hrs)...`
-  handleScrollTo('featured')
+  // Stay on discovery section and let the map fly to the searched parking zone
+  activeFeedback.value = `Searching: ${params.location}...`
   setTimeout(() => {
     activeFeedback.value = ''
-  }, 4000)
+  }, 2500)
 }
 
 function handleAiSearch(query) {
-  activeFeedback.value = `AI Recommendation Engine processing: "${query}"...`
-  handleScrollTo('featured')
+  activeFeedback.value = `AI Recommendation: "${query}"...`
   setTimeout(() => {
     activeFeedback.value = ''
-  }, 4000)
+  }, 2500)
 }
 
 function handleSelectLocation(loc) {

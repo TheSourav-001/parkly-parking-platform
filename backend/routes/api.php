@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\ParkingFacilityController;
 use App\Http\Controllers\Api\VehicleTypeController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,12 @@ Route::get('/health-check', function () {
 Route::get('/locations', [LocationController::class, 'index']);
 Route::get('/vehicle-types', [VehicleTypeController::class, 'index']);
 
+// Parking Facilities API
+Route::prefix('v1')->group(function () {
+    Route::get('/facilities', [ParkingFacilityController::class, 'index']);
+    Route::get('/facilities/{id}', [ParkingFacilityController::class, 'show']);
+});
+
 // Authentication APIs
 Route::prefix('v1/auth')->group(function () {
     // Public authentication routes
@@ -40,4 +47,3 @@ Route::prefix('v1/auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
     });
 });
-
