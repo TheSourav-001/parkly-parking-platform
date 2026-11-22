@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\ParkingFacilityController;
+use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\VehicleTypeController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,13 @@ Route::get('/vehicle-types', [VehicleTypeController::class, 'index']);
 Route::prefix('v1')->group(function () {
     Route::get('/facilities', [ParkingFacilityController::class, 'index']);
     Route::get('/facilities/{id}', [ParkingFacilityController::class, 'show']);
+
+    // Support, Operator Enquiries & Newsletter (throttled & validated)
+    Route::middleware('throttle:10,1')->group(function () {
+        Route::post('/support/contact', [SupportController::class, 'submitContact']);
+        Route::post('/operators/enquiry', [SupportController::class, 'submitOperatorEnquiry']);
+        Route::post('/subscribers', [SupportController::class, 'subscribe']);
+    });
 });
 
 // Authentication APIs

@@ -8,6 +8,10 @@ import ResetPasswordView from '../views/auth/ResetPasswordView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import TermsView from '../views/legal/TermsView.vue'
 import PrivacyView from '../views/legal/PrivacyView.vue'
+import CancellationPolicyView from '../views/legal/CancellationPolicyView.vue'
+import LocationDataUseView from '../views/legal/LocationDataUseView.vue'
+import ContactView from '../views/ContactView.vue'
+import OperatorEnquiryView from '../views/OperatorEnquiryView.vue'
 import { useAuthStore } from '../stores/auth'
 
 const routes = [
@@ -72,6 +76,30 @@ const routes = [
     meta: { title: 'Privacy Policy — Parkly', isAuth: false },
   },
   {
+    path: '/cancellation-policy',
+    name: 'cancellation-policy',
+    component: CancellationPolicyView,
+    meta: { title: 'Cancellation & Refund Policy — Parkly', isAuth: false },
+  },
+  {
+    path: '/location-and-data-use',
+    name: 'location-and-data-use',
+    component: LocationDataUseView,
+    meta: { title: 'Location & Data Use — Parkly', isAuth: false },
+  },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: ContactView,
+    meta: { title: 'Contact Support — Parkly', isAuth: false },
+  },
+  {
+    path: '/operators/enquiry',
+    name: 'operators-enquiry',
+    component: OperatorEnquiryView,
+    meta: { title: 'List Your Parking — Parkly', isAuth: false },
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/',
   },
@@ -80,9 +108,32 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior(to) {
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
     if (to.hash) {
-      return { el: to.hash, behavior: 'smooth', top: 110 }
+      // Map cross-route and footer aliases to actual section element IDs
+      const aliasMap = {
+        '#find-parking': '#discovery',
+        '#journey': '#how-it-works',
+        '#pricing': '#featured',
+        '#operators': '#discovery',
+        '#faq': '#how-it-works',
+      }
+      const targetHash = aliasMap[to.hash] || to.hash
+
+      return new Promise((resolve) => {
+        // Wait slightly for DOM to settle if navigating between distinct routes
+        setTimeout(() => {
+          const el = document.querySelector(targetHash)
+          if (el) {
+            resolve({ el: targetHash, behavior: 'smooth', top: 110 })
+          } else {
+            resolve({ top: 0, behavior: 'smooth' })
+          }
+        }, 120)
+      })
     }
     return { top: 0 }
   },
