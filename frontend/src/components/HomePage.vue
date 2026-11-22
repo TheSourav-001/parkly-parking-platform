@@ -39,7 +39,8 @@ function handleScrollTo(id) {
 }
 
 function handleSearch(params) {
-  activeFeedback.value = `Searching: ${params.location}...`
+  const loc = params?.area || params?.thana || params?.district || params?.location || 'Dhaka'
+  activeFeedback.value = `Searching parking in ${loc}...`
   setTimeout(() => {
     activeFeedback.value = ''
   }, 2500)
