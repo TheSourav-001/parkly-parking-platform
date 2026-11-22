@@ -12,7 +12,7 @@ const selectedRegion = ref('Bangladesh (EN)')
 </script>
 
 <template>
-  <footer class="parkly-footer" id="support">
+  <footer class="parkly-footer">
     <div class="footer-inner">
       <!-- Conversational Headline Section -->
       <div class="footer-hero">
@@ -36,7 +36,7 @@ const selectedRegion = ref('Bangladesh (EN)')
             <li><a href="#journey">The Journey</a></li>
             <li><a href="#locations">Dhaka Hubs</a></li>
             <li><a href="#operators">For Operators</a></li>
-            <li><a href="#support">Help & FAQ</a></li>
+            <li><a href="#faq">Help & FAQ</a></li>
           </ul>
         </div>
 
@@ -71,7 +71,7 @@ const selectedRegion = ref('Bangladesh (EN)')
             <li><router-link to="/terms">Terms of Service</router-link></li>
             <li><a href="#cookies">Cookie Preferences</a></li>
             <li><router-link to="/terms#cancellation">Cancellation Policy</router-link></li>
-            <li><a href="#help">Help Center & FAQ</a></li>
+            <li><a href="#faq">Help Center & FAQ</a></li>
           </ul>
         </div>
       </div>

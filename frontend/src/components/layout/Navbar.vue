@@ -106,7 +106,7 @@ onUnmounted(() => {
         <a href="/#journey" class="nav-link" @click.prevent="handleSectionNav('journey')">How It Works</a>
         <a href="/#locations" class="nav-link" @click.prevent="handleSectionNav('locations')">Locations</a>
         <a href="/#operators" class="nav-link" @click.prevent="handleSectionNav('operators')">For Operators</a>
-        <a href="/#support" class="nav-link" @click.prevent="handleSectionNav('support')">Support</a>
+        <a href="/#faq" class="nav-link" @click.prevent="handleSectionNav('faq')">Support</a>
       </nav>
 
       <!-- Right Actions: Search Circle + Theme Toggle + Sign In / User Profile Dropdown -->
@@ -238,7 +238,7 @@ onUnmounted(() => {
             <a href="/#journey" class="mobile-link" @click.prevent="handleSectionNav('journey')">How It Works</a>
             <a href="/#locations" class="mobile-link" @click.prevent="handleSectionNav('locations')">Locations</a>
             <a href="/#operators" class="mobile-link" @click.prevent="handleSectionNav('operators')">For Operators</a>
-            <a href="/#support" class="mobile-link" @click.prevent="handleSectionNav('support')">Support</a>
+            <a href="/#faq" class="mobile-link" @click.prevent="handleSectionNav('faq')">Support</a>
           </div>
           <div class="mobile-drawer-footer">
             <template v-if="!authStore.isAuthenticated">
