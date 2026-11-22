@@ -1,109 +1,281 @@
 <script setup>
 /**
  * FaqSection Component
- * ID: support (targeted by Navbar "Support").
- * Fully keyboard-accessible accordion addressing transparent realities of Parkly:
- * - Real-time availability vs reported counts (no cameras/sensors/CCTV myths)
- * - Account requirement (browse/search freely; account needed only at booking)
- * - How entry verification works (digital PDF invoice shown to on-duty staff, no automated gates)
- * - How AI works (Gemini extracts search intent; inventory strictly comes from DB records)
- * - Dhaka-centered scope (District -> Thana -> Area cascading filter)
- * - Pricing & calculation (calculated by backend based on vehicle type and duration)
- * - Payment processing (SSLCOMMERZ sandbox demo flow)
- * - For garage operators & administrators (manual updates, booking alerts, status tracking)
+ * Reference: React "FAQ 5" ported directly to Vue 3 (Single-file Component)
+ * - Section ID: #faq (also aliased for #support so legacy and new links work seamlessly)
+ * - 2-column bordered frame: left column intro (mono eyebrow, serif heading, muted paragraph),
+ *   right column hairline accordion with rotating chevron.
+ * - Single-open collapsible with animated height (grid-template-rows 0fr -> 1fr).
+ * - Full WCAG AA accessibility: heading <h3>, <button> trigger, aria-expanded, aria-controls,
+ *   role="region", Arrow Up/Down & Home/End keyboard navigation.
+ * - Deep linking: hash #faq-{id} opens item & updates hash via history.replaceState.
+ * - FAQPage Schema (JSON-LD) injected into <head>.
+ * - Zero emojis, no fake sensor/automation/rating claims.
  */
-import { ref } from 'vue'
-import SectionHeader from '../common/SectionHeader.vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
-const openIndex = ref(0)
+// Prototype sandbox flag (can also read from import.meta.env.VITE_PAYMENT_SANDBOX if defined)
+const isPaymentSandbox = ref(true)
 
 const faqs = [
   {
-    q: 'How does parking slot availability work in Parkly?',
-    a: 'Availability in Parkly represents reported slot counts maintained directly by facility administrators or garage attendants. We do not use automated cameras, CCTV analytics, or IoT road sensors. When a driver books a slot, the system reserves that record, and available counts reflect the latest operator updates.',
+    id: 'availability',
+    q: 'Is availability live?',
+    a: 'Availability is the number of free slots last reported by the parking operator or an administrator. Each facility shows when it was last updated; if it is old or missing, Parkly says so instead of guessing.',
+    group: 'discovery',
   },
   {
+    id: 'account',
     q: 'Do I need an account to search for parking?',
-    a: 'No. Anyone can search for parking across Dhaka by GPS or cascading dropdowns (District → Thana → Area), check hourly fees, filter by vehicle type, or use Ask Parkly AI without creating an account. Account details are collected only when you confirm and pay for a booking.',
+    a: 'No. You can search and compare without signing in. Account details are asked only when you make a booking.',
+    group: 'account',
   },
   {
-    q: 'How do I enter the parking facility after booking?',
-    a: 'Once your payment is confirmed, Parkly generates a digital booking confirmation and downloadable PDF invoice with a unique Booking ID. When you arrive at the garage gate, show this invoice or Booking ID on your phone to the parking staff or security guard. They verify it against their operator booking record before granting entry. There are no automatic boom barriers or sensor gates.',
+    id: 'near-me',
+    q: 'How do I find parking near me?',
+    a: 'Allow location access, or choose District, Thana and Area manually. Parkly asks permission before using your location and the manual option always works.',
+    group: 'discovery',
   },
   {
-    q: 'What is the role of Google Gemini AI in Parkly?',
-    a: 'Our AI feature ("Ask Parkly AI") is powered by Google Gemini strictly to parse natural-language prompts into structured search filters (such as location, vehicle type, duration, and budget). The AI does not generate inventory, predict availability, or confirm bookings. Every recommendation comes strictly from verified database records.',
+    id: 'ai-assistant',
+    q: 'What does the AI assistant do?',
+    a: 'You can describe what you need in plain language, such as an affordable spot in Mirpur for an SUV. The AI picks out the area, vehicle type, budget and duration, and Parkly matches them against registered facilities. It does not create prices or availability and does not confirm bookings.',
+    group: 'ai',
   },
   {
-    q: 'How are parking fees calculated?',
-    a: 'Fees are calculated entirely on the backend based on your chosen vehicle category (Car, Motorcycle, or Others), the facility\'s configured hourly tariff, and your selected duration. The frontend displays the server-calculated total prior to checkout so you never face hidden fees or surge pricing.',
+    id: 'fee-calculation',
+    q: 'How is the fee calculated?',
+    a: 'The server calculates the fee from the facility\'s configured rate for your vehicle type and the duration you choose. You see the total before you pay.',
+    group: 'pricing',
   },
   {
-    q: 'Why is Parkly currently focused on Dhaka?',
-    a: 'Parkly is designed around Dhaka\'s urban traffic hubs (such as Gulshan, Banani, Dhanmondi, Motijheel, and Uttara) where congestion and parking scarcity are most acute. The search hierarchy allows fast, accurate filtering by District, Thana, and Area without unnecessary nationwide fields.',
-  },
-  {
+    id: 'vehicle-types',
     q: 'Which vehicle types are supported?',
-    a: 'Parkly supports standard Cars/Sedans, Motorcycles, and Others (including SUVs and microbuses) where designated by individual facility operators. Each facility profile indicates which vehicle types it accepts and their respective slot allocations.',
+    a: 'Car, SUV, Motorcycle and Others (only the types present in the database; each facility lists what it accepts).',
+    group: 'pricing',
   },
   {
-    q: 'How does payment work on the platform?',
-    a: 'The platform integrates with the SSLCOMMERZ payment gateway sandbox for the prototype evaluation. You can test checkout with demo mobile banking accounts (bKash, Nagad) or sandbox test cards. Real funds are not deducted during this evaluation phase.',
+    id: 'payment',
+    q: 'How do I pay?',
+    a: computed(() => {
+      if (isPaymentSandbox.value) {
+        return 'Online payment through the supported gateway. During the prototype the gateway runs in sandbox mode, so no real money is taken.'
+      }
+      return 'Online payment through the supported gateway. You can choose mobile banking or card payments at checkout.'
+    }),
+    group: 'payment',
   },
   {
-    q: 'How do garage owners and administrators manage bookings?',
-    a: 'Authorized administrators and operators access a dedicated management panel where they can register facility details, configure vehicle pricing, update reported available slots, receive new booking notifications, and track booking statuses through Pending → Confirmed → In Progress → Completed.',
+    id: 'entrance-verification',
+    q: 'What do I show at the parking entrance?',
+    a: 'Your digital invoice with the Booking ID. Parking staff check it against the booking record before you enter. Entry is not automated.',
+    group: 'entry',
+  },
+  {
+    id: 'cancellation',
+    q: 'Can I cancel a booking?',
+    a: 'Cancellation follows the Cancellation and Refund Policy outlined in our Terms of Service. Review booking details and operator rules before cancelling.',
+    group: 'booking',
+    link: '/terms#cancellation',
+    linkText: 'Terms of Service',
+  },
+  {
+    id: 'listing',
+    q: 'I am a parking owner. How do I list my parking?',
+    a: 'Use "List your parking" to send an enquiry. Administrators or operators then manage prices, slot availability and booking status in the admin panel.',
+    group: 'operator',
+  },
+  {
+    id: 'report-issue',
+    q: 'What if the price or availability looks wrong?',
+    a: 'Report it through Contact support so the operator can correct it.',
+    group: 'support',
   },
 ]
 
-function toggleFaq(idx) {
-  openIndex.value = openIndex.value === idx ? -1 : idx
+// Single open item id (First item open by default)
+const openItemId = ref('availability')
+
+function toggleItem(id) {
+  if (openItemId.value === id) {
+    openItemId.value = null
+  } else {
+    openItemId.value = id
+    // Update URL hash without causing a page jump
+    const hash = `#faq-${id}`
+    if (window.location.hash !== hash) {
+      window.history.replaceState(null, '', hash)
+    }
+  }
 }
+
+// Keyboard Navigation between Accordion Triggers
+function handleKeydown(event, currentIndex) {
+  const triggers = document.querySelectorAll('.faq-trigger-btn')
+  if (!triggers.length) return
+
+  let targetIndex = null
+  if (event.key === 'ArrowDown') {
+    event.preventDefault()
+    targetIndex = (currentIndex + 1) % triggers.length
+  } else if (event.key === 'ArrowUp') {
+    event.preventDefault()
+    targetIndex = (currentIndex - 1 + triggers.length) % triggers.length
+  } else if (event.key === 'Home') {
+    event.preventDefault()
+    targetIndex = 0
+  } else if (event.key === 'End') {
+    event.preventDefault()
+    targetIndex = triggers.length - 1
+  }
+
+  if (targetIndex !== null && triggers[targetIndex]) {
+    triggers[targetIndex].focus()
+  }
+}
+
+// Deep Link Handling on Mount & Hash Changes
+function checkHash() {
+  const hash = window.location.hash
+  if (!hash) return
+
+  if (hash === '#faq' || hash === '#support') {
+    // Just scroll to section
+    return
+  }
+
+  const prefix = '#faq-'
+  if (hash.startsWith(prefix)) {
+    const targetId = hash.slice(prefix.length)
+    const exists = faqs.some((f) => f.id === targetId)
+    if (exists) {
+      openItemId.value = targetId
+    }
+  }
+}
+
+let jsonLdScript = null
+
+function injectSchema() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: typeof f.a === 'object' ? f.a.value : f.a,
+      },
+    })),
+  }
+
+  jsonLdScript = document.createElement('script')
+  jsonLdScript.type = 'application/ld+json'
+  jsonLdScript.text = JSON.stringify(schema)
+  document.head.appendChild(jsonLdScript)
+}
+
+onMounted(() => {
+  checkHash()
+  window.addEventListener('hashchange', checkHash)
+  injectSchema()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', checkHash)
+  if (jsonLdScript && jsonLdScript.parentNode) {
+    jsonLdScript.parentNode.removeChild(jsonLdScript.parentNode)
+  }
+})
 </script>
 
 <template>
-  <section id="support" class="faq-section">
+  <section id="faq" class="parkly-faq-section">
+    <!-- Anchor hook for legacy #support links -->
+    <div id="support" class="faq-scroll-anchor" aria-hidden="true"></div>
+
     <div class="faq-container">
-      <SectionHeader
-        eyebrow="Help & Transparency"
-        title="Frequently Asked Questions"
-        subtitle="Transparent answers regarding how Parkly operates, how availability is recorded, and how entry verification works."
-      />
+      <!-- Outer Bordered Frame: 1px hairline, two equal columns on md+ -->
+      <div class="faq-frame-card">
+        <!-- Left Column: Intro (Sticky / Top-aligned) -->
+        <div class="faq-intro-col">
+          <div class="intro-content-stack">
+            <span class="faq-mono-eyebrow">FAQ</span>
+            <h2 class="faq-serif-heading">Questions, answered.</h2>
+            <p class="faq-intro-desc">
+              The things drivers and operators ask most about Parkly. Still stuck?
+              <a href="mailto:support@parkly.com" class="faq-inline-link">Contact support</a>
+              and we will help.
+            </p>
+          </div>
+        </div>
 
-      <div class="accordion-wrapper">
-        <div
-          v-for="(faq, idx) in faqs"
-          :key="idx"
-          class="accordion-item"
-          :class="{ 'is-open': openIndex === idx }"
-        >
-          <button
-            class="accordion-trigger"
-            :aria-expanded="openIndex === idx"
-            @click="toggleFaq(idx)"
-          >
-            <span class="faq-question">{{ faq.q }}</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="faq-icon-svg"
-                :class="{ 'is-rotated': openIndex === idx }"
+        <!-- Right Column: Hairline Accordion List -->
+        <div class="faq-list-col">
+          <div class="faq-accordion-stack">
+            <div
+              v-for="(item, idx) in faqs"
+              :key="item.id"
+              class="faq-item"
+              :class="{ 'is-open': openItemId === item.id }"
+            >
+              <!-- Accessible Accordion Header & Trigger -->
+              <h3 class="faq-item-heading">
+                <button
+                  type="button"
+                  :id="`faq-trigger-${item.id}`"
+                  class="faq-trigger-btn"
+                  :aria-expanded="openItemId === item.id"
+                  :aria-controls="`faq-panel-${item.id}`"
+                  @click="toggleItem(item.id)"
+                  @keydown="handleKeydown($event, idx)"
+                >
+                  <span class="faq-q-text">{{ item.q }}</span>
+
+                  <!-- Rotating SVG Chevron Icon -->
+                  <span class="chevron-wrap" aria-hidden="true">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="chevron-svg"
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </span>
+                </button>
+              </h3>
+
+              <!-- CSS Grid-Template-Rows Animated Panel -->
+              <div
+                :id="`faq-panel-${item.id}`"
+                role="region"
+                :aria-labelledby="`faq-trigger-${item.id}`"
+                class="faq-answer-grid"
+                :class="{ 'is-expanded': openItemId === item.id }"
               >
-                <line x1="12" y1="5" x2="12" y2="19" class="vertical-line" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </span>
-          </button>
-
-          <div v-show="openIndex === idx" class="accordion-content">
-            <p class="faq-answer">{{ faq.a }}</p>
+                <div class="faq-answer-overflow">
+                  <div class="faq-answer-body">
+                    <p class="faq-a-text">
+                      {{ typeof item.a === 'object' ? item.a.value : item.a }}
+                      <router-link
+                        v-if="item.link"
+                        :to="item.link"
+                        class="faq-inline-link"
+                      >
+                        {{ item.linkText }}
+                      </router-link>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -112,130 +284,245 @@ function toggleFaq(idx) {
 </template>
 
 <style scoped>
-.faq-section {
+.parkly-faq-section {
+  position: relative;
   width: 100%;
-  padding: 120px 24px;
-  background-color: var(--color-bg);
-  border-top: 1px solid var(--color-border);
+  padding: 64px 20px;
+  background-color: var(--color-bg, #F8FAFC);
+  scroll-margin-top: var(--nav-h, 72px);
+}
+
+@media (min-width: 768px) {
+  .parkly-faq-section {
+    padding: 96px 24px;
+  }
+}
+
+.faq-scroll-anchor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 1px;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .faq-container {
-  max-width: 860px;
+  max-width: 1024px; /* max-w-5xl */
   margin: 0 auto;
 }
 
-.accordion-wrapper {
+/* Single Bordered Frame: border-y always, md:border-x */
+.faq-frame-card {
+  width: 100%;
+  border-top: 1px solid var(--color-border, #E2E8F0);
+  border-bottom: 1px solid var(--color-border, #E2E8F0);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 48px;
 }
 
-.accordion-item {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg, 12px);
-  overflow: hidden;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+@media (min-width: 768px) {
+  .faq-frame-card {
+    border-left: 1px solid var(--color-border, #E2E8F0);
+    border-right: 1px solid var(--color-border, #E2E8F0);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
-.accordion-item:hover {
-  border-color: var(--color-primary);
+/* Left Column: Intro */
+.faq-intro-col {
+  padding: 48px 24px 28px;
+  border-bottom: 1px solid var(--color-border, #E2E8F0);
 }
 
-.accordion-item.is-open {
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 16px -2px rgba(15, 118, 110, 0.08);
+@media (min-width: 768px) {
+  .faq-intro-col {
+    padding: 64px 40px;
+    border-bottom: none;
+    border-right: 1px solid var(--color-border, #E2E8F0);
+  }
 }
 
-.accordion-trigger {
+.intro-content-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 380px;
+}
+
+/* Monospace Uppercase Eyebrow: 10px, tracking 0.16em */
+.faq-mono-eyebrow {
+  font-family: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-primary, #0F766E);
+}
+
+/* Serif Heading: text-4xl md:text-5xl, medium weight, line-height 1.04 */
+.faq-serif-heading {
+  font-family: 'Instrument Serif', 'Fraunces', Georgia, serif;
+  font-size: clamp(2.35rem, 4vw, 3.15rem);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: var(--color-text, #0F172A);
+  margin: 0;
+}
+
+.faq-intro-desc {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-text-muted, #64748B);
+  margin: 0;
+}
+
+.faq-inline-link {
+  color: var(--color-primary, #0F766E);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity var(--transition-fast);
+}
+
+.faq-inline-link:hover {
+  opacity: 0.8;
+}
+
+/* Right Column: List */
+.faq-list-col {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .faq-list-col {
+    padding: 32px;
+  }
+}
+
+.faq-accordion-stack {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  padding: 22px 24px;
+}
+
+/* Each item has a bottom hairline */
+.faq-item {
+  border-bottom: 1px solid var(--color-border, #E2E8F0);
+  transition: border-color var(--transition-fast);
+}
+
+.faq-item:last-child {
+  border-bottom: none;
+}
+
+.faq-item-heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* Trigger Row: py-4, font medium, underline on hover */
+.faq-trigger-btn {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  padding: 16px 0;
+  min-height: 44px; /* Accessible tap target */
   background: transparent;
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background-color var(--transition-fast);
+  outline: none;
+  color: var(--color-text, #0F172A);
 }
 
-.accordion-trigger:hover {
-  background-color: rgba(15, 118, 110, 0.02);
+.faq-trigger-btn:focus-visible {
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--color-primary, #0F766E);
 }
 
-.faq-question {
+.faq-q-text {
   font-family: var(--font-sans);
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--color-text);
-  line-height: 1.4;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--color-text, #0F172A);
+  transition: color var(--transition-fast);
 }
 
-.faq-icon {
+.faq-trigger-btn:hover .faq-q-text {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.faq-item.is-open .faq-q-text {
+  color: var(--color-primary, #0F766E);
+}
+
+/* Small Chevron Rotating 180deg */
+.chevron-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--color-bg);
-  border: 1px solid var(--color-border);
-  color: var(--color-primary);
   flex-shrink: 0;
-  transition: transform var(--transition-fast), background-color var(--transition-fast);
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted, #64748B);
+  transition: transform 220ms ease, color 220ms ease;
 }
 
-.accordion-item.is-open .faq-icon {
-  background-color: var(--color-primary);
-  color: var(--color-primary-contrast, #FFF);
-  border-color: var(--color-primary);
+.faq-item.is-open .chevron-wrap {
+  transform: rotate(180deg);
+  color: var(--color-primary, #0F766E);
 }
 
-.faq-icon-svg .vertical-line {
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  transform-origin: center;
+.chevron-svg {
+  display: block;
 }
 
-.faq-icon-svg.is-rotated .vertical-line {
-  transform: scaleY(0);
+/* Animated Height with CSS Grid-Template-Rows Trick (0fr -> 1fr) */
+.faq-answer-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease;
   opacity: 0;
 }
 
-.accordion-content {
-  padding: 0 24px 22px;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
+.faq-answer-grid.is-expanded {
+  grid-template-rows: 1fr;
+  opacity: 1;
 }
 
-.faq-answer {
+.faq-answer-overflow {
+  overflow: hidden;
+}
+
+.faq-answer-body {
+  padding-bottom: 16px;
+}
+
+.faq-a-text {
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  color: var(--color-text-muted);
-  line-height: 1.65;
-  margin: 14px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-muted, #64748B);
+  margin: 0;
 }
 
-@media (max-width: 640px) {
-  .faq-section {
-    padding: 72px 16px;
-  }
-
-  .accordion-trigger {
-    padding: 18px 18px;
-  }
-
-  .faq-question {
-    font-size: 0.95rem;
-  }
-
-  .accordion-content {
-    padding: 0 18px 18px;
-  }
-
-  .faq-answer {
-    font-size: 0.875rem;
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .chevron-wrap,
+  .faq-answer-grid {
+    transition: none !important;
   }
 }
 </style>
