@@ -12,9 +12,23 @@ class Location extends Model
     protected $fillable = [
         'parent_id',
         'name',
+        'name_en',
+        'name_bn',
         'type',
         'slug',
+        'latitude',
+        'longitude',
+        'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'latitude'  => 'decimal:7',
+            'longitude' => 'decimal:7',
+            'is_active' => 'boolean',
+        ];
+    }
 
     public function parent()
     {

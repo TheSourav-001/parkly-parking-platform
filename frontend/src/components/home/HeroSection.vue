@@ -751,21 +751,21 @@ onBeforeUnmount(() => {
             </AppButton>
           </div>
 
-          <!-- Trust Stats -->
+          <!-- Trust Stats (Honest, Admin-Updated Metrics) -->
           <div class="hero-stats">
             <div class="stat-pill">
-              <span class="stat-number">50+</span>
-              <span class="stat-label">Verified Garages</span>
+              <span class="stat-number">12+</span>
+              <span class="stat-label">Dhaka Hubs</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-pill">
-              <span class="stat-number">99.8%</span>
-              <span class="stat-label">Spot Guarantee</span>
+              <span class="stat-number">Reported</span>
+              <span class="stat-label">Slot Status</span>
             </div>
             <div class="stat-divider"></div>
             <div class="stat-pill">
-              <span class="stat-number">AI</span>
-              <span class="stat-label">Optimal Routing</span>
+              <span class="stat-number">Staff</span>
+              <span class="stat-label">Verified Entry</span>
             </div>
           </div>
         </div>

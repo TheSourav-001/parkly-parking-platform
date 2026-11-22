@@ -1,23 +1,33 @@
 <script setup>
 /**
  * HomePage Component
- * Orchestrates the full redesigned homepage experience:
- * 1. HeroSection (Asymmetric, Circular Masks, Satellite CTA, Orbital Arcs)
- * 2. SearchWidget (Elevated Pill Bar + Ask Parkly AI)
- * 3. FeaturesSection (4 Architecture Blocks)
- * 4. HowItWorksSection (4 Step Connected Nodes)
- * 5. LocationsSection (4 Stadium Cards with Satellite Arrow CTAs)
- * 6. FeaturedFacilitiesSection (Verified Garages & Live Slots)
- * 7. CtaBannerSection (40px Stadium Banner)
+ * Orchestrates the full redesigned homepage experience per Master Prompt:
+ * 1. HeroSection (Visual design kept, honest copy updated)
+ * 2. SearchWidget (Direct Search + Ask Parkly AI with 3D Map)
+ * 3. TrustStrip (Registered facilities, reported slots, live API stats)
+ * 4. JourneyStory (600vh signature scroll parallax story with 6 steps)
+ * 5. AISearchShowcase (Prompt examples, extracted chips, DB cards, what AI does/doesn't do)
+ * 6. VehiclesAndPricing (Car, Motorcycle, Others + Instant server fee estimator)
+ * 7. BookingAndInvoice (Book, Sandbox SSLCOMMERZ checkout, Sample invoice + Status Stepper)
+ * 8. ForOperators (id: operators, benefits + interactive dashboard mock)
+ * 9. DhakaCoverage (id: locations, Dhaka areas grid with facility counts)
+ * 10. PrivacyAndSafety (On-click GPS, un-stored payment info, reported availability)
+ * 11. RoadmapSection (Planned features: mobile app, ANPR hardware, more cities)
+ * 12. FaqSection (id: support, accessible questions & answers)
+ * 13. FinalCTA (Find parking & List your garage)
  */
 import { ref } from 'vue'
 import HeroSection from './home/HeroSection.vue'
 import SearchWidget from './home/SearchWidget.vue'
-import FeaturesSection from './home/FeaturesSection.vue'
-import HowItWorksSection from './home/HowItWorksSection.vue'
-import LocationsSection from './home/LocationsSection.vue'
-import FeaturedFacilitiesSection from './home/FeaturedFacilitiesSection.vue'
-import CtaBannerSection from './home/CtaBannerSection.vue'
+import JourneyStory from './home/JourneyStory.vue'
+import BookingAndInvoice from './home/BookingAndInvoice.vue'
+import VehicleDeck from './home/VehicleDeck.vue'
+import ForOperators from './home/ForOperators.vue'
+import DhakaCoverage from './home/DhakaCoverage.vue'
+import PrivacyAndSafety from './home/PrivacyAndSafety.vue'
+import RoadmapSection from './home/RoadmapSection.vue'
+import FaqSection from './home/FaqSection.vue'
+import FinalCTA from './home/FinalCTA.vue'
 
 const activeFeedback = ref('')
 
@@ -29,7 +39,6 @@ function handleScrollTo(id) {
 }
 
 function handleSearch(params) {
-  // Stay on discovery section and let the map fly to the searched parking zone
   activeFeedback.value = `Searching: ${params.location}...`
   setTimeout(() => {
     activeFeedback.value = ''
@@ -41,21 +50,6 @@ function handleAiSearch(query) {
   setTimeout(() => {
     activeFeedback.value = ''
   }, 2500)
-}
-
-function handleSelectLocation(loc) {
-  activeFeedback.value = `Selected region: ${loc.name}. Loading ${loc.registeredFacilities} parking hubs...`
-  handleScrollTo('featured')
-  setTimeout(() => {
-    activeFeedback.value = ''
-  }, 4000)
-}
-
-function handleBookFacility(facility) {
-  activeFeedback.value = `Booking pass requested for "${facility.name}". Reservation modal ready.`
-  setTimeout(() => {
-    activeFeedback.value = ''
-  }, 5000)
 }
 </script>
 
@@ -69,38 +63,44 @@ function handleBookFacility(facility) {
       </div>
     </transition>
 
-    <!-- 1. Hero Section -->
+    <!-- 1. Hero Section (Visuals preserved, copy corrected) -->
     <HeroSection
       @explore="handleScrollTo('discovery')"
-      @howItWorks="handleScrollTo('how-it-works')"
+      @howItWorks="handleScrollTo('journey')"
     />
 
-    <!-- 2. Search Widget -->
+    <!-- 2. Search & Map Widget (Direct Search & Ask Parkly AI) -->
     <SearchWidget
       @search="handleSearch"
       @aiSearch="handleAiSearch"
     />
 
-    <!-- 3. Core Features Section -->
-    <FeaturesSection />
+    <!-- 3. Signature Scroll Story (Replaces old 4 steps) -->
+    <JourneyStory />
 
-    <!-- 4. How It Works Section -->
-    <HowItWorksSection />
+    <!-- 4. Booking & Invoice (Sandbox demo, invoice mock & lifecycle stepper) -->
+    <BookingAndInvoice />
 
-    <!-- 5. Popular Locations Section -->
-    <LocationsSection
-      @selectLocation="handleSelectLocation"
-    />
+    <!-- 5. Vehicle Classes & Server-Calculated Pricing (Full-Window Scroll-Stacking Card Deck) -->
+    <VehicleDeck />
 
-    <!-- 6. Featured Facilities Showcase -->
-    <FeaturedFacilitiesSection
-      @bookFacility="handleBookFacility"
-    />
+    <!-- 8. For Operators (id: operators) -->
+    <ForOperators />
 
-    <!-- 7. Call To Action Stadium Banner -->
-    <CtaBannerSection
-      @action="handleScrollTo('discovery')"
-    />
+    <!-- 9. Dhaka Coverage (id: locations) -->
+    <DhakaCoverage />
+
+    <!-- 10. Privacy & Safety -->
+    <PrivacyAndSafety />
+
+    <!-- 11. Product Roadmap (Planned Features) -->
+    <RoadmapSection />
+
+    <!-- 12. Frequently Asked Questions (id: support) -->
+    <FaqSection />
+
+    <!-- 13. Final Call To Action -->
+    <FinalCTA />
   </main>
 </template>
 
@@ -154,4 +154,3 @@ function handleBookFacility(facility) {
   transform: translateY(16px);
 }
 </style>
-
