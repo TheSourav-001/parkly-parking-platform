@@ -12,6 +12,10 @@ class ParkingFacility extends Model
 
     protected $fillable = [
         'location_id',
+        'area_id',
+        'thana_id',
+        'district_id',
+        'division_id',
         'name',
         'slug',
         'address_text',
@@ -35,6 +39,26 @@ class ParkingFacility extends Model
     public function location()
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Location::class, 'area_id');
+    }
+
+    public function thana()
+    {
+        return $this->belongsTo(Location::class, 'thana_id');
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(Location::class, 'district_id');
+    }
+
+    public function division()
+    {
+        return $this->belongsTo(Location::class, 'division_id');
     }
 
     public function creator()

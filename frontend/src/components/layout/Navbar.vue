@@ -103,9 +103,8 @@ onUnmounted(() => {
       <!-- Desktop Links: Airy pill spacing -->
       <nav class="nav-links" aria-label="Main Navigation">
         <a href="/#discovery" class="nav-link" @click.prevent="handleSectionNav('discovery')">Find Parking</a>
-        <a href="/#how-it-works" class="nav-link" @click.prevent="handleSectionNav('how-it-works')">How It Works</a>
+        <a href="/#journey" class="nav-link" @click.prevent="handleSectionNav('journey')">How It Works</a>
         <a href="/#locations" class="nav-link" @click.prevent="handleSectionNav('locations')">Locations</a>
-        <a href="/#featured" class="nav-link" @click.prevent="handleSectionNav('featured')">Featured</a>
         <a href="/#operators" class="nav-link" @click.prevent="handleSectionNav('operators')">For Operators</a>
         <a href="/#support" class="nav-link" @click.prevent="handleSectionNav('support')">Support</a>
       </nav>
@@ -236,9 +235,8 @@ onUnmounted(() => {
           </div>
           <div class="mobile-drawer-links">
             <a href="/#discovery" class="mobile-link" @click.prevent="handleSectionNav('discovery')">Find Parking</a>
-            <a href="/#how-it-works" class="mobile-link" @click.prevent="handleSectionNav('how-it-works')">How It Works</a>
-            <a href="/#locations" class="mobile-link" @click.prevent="handleSectionNav('locations')">Popular Locations</a>
-            <a href="/#featured" class="mobile-link" @click.prevent="handleSectionNav('featured')">Featured Facilities</a>
+            <a href="/#journey" class="mobile-link" @click.prevent="handleSectionNav('journey')">How It Works</a>
+            <a href="/#locations" class="mobile-link" @click.prevent="handleSectionNav('locations')">Locations</a>
             <a href="/#operators" class="mobile-link" @click.prevent="handleSectionNav('operators')">For Operators</a>
             <a href="/#support" class="mobile-link" @click.prevent="handleSectionNav('support')">Support</a>
           </div>

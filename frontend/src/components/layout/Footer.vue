@@ -33,32 +33,21 @@ const selectedRegion = ref('Bangladesh (EN)')
           <h3 class="column-header">PLATFORM</h3>
           <ul class="column-links">
             <li><a href="#discovery">Find Parking</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#locations">Popular Locations</a></li>
-            <li><a href="#featured">Featured Facilities</a></li>
-            <li><a href="#ai-search">Ask Parkly AI</a></li>
+            <li><a href="#journey">The Journey</a></li>
+            <li><a href="#locations">Dhaka Hubs</a></li>
+            <li><a href="#operators">For Operators</a></li>
+            <li><a href="#support">Help & FAQ</a></li>
           </ul>
         </div>
 
         <!-- Col 2: For Operators -->
-        <div class="footer-column" id="operators">
+        <div class="footer-column">
           <h3 class="column-header">FOR OPERATORS</h3>
           <ul class="column-links">
-            <li>
-              <a href="#partner">
-                Parking Operators
-                <span class="ext-arrow" aria-hidden="true">&nearr;</span>
-              </a>
-            </li>
-            <li>
-              <a href="#partner-with-us">
-                Partner With Us
-                <span class="ext-arrow" aria-hidden="true">&nearr;</span>
-              </a>
-            </li>
-            <li><a href="#portal">Operator Portal</a></li>
-            <li><a href="#hardware">Sensor & Gate API</a></li>
-            <li><a href="#enterprise">Commercial Garages</a></li>
+            <li><a href="#operators">List Your Facility</a></li>
+            <li><a href="/register">Operator Registration</a></li>
+            <li><a href="/login">Attendant Login</a></li>
+            <li><a href="#support">Verification Support</a></li>
           </ul>
         </div>
 
