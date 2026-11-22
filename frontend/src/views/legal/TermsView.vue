@@ -59,9 +59,9 @@ onUnmounted(() => {
     <!-- Header Hero Banner -->
     <header class="legal-header">
       <div class="legal-container header-inner">
-        <div class="header-badge">
+        <div class="header-badge" role="note">
           <span class="badge-dot" aria-hidden="true"></span>
-          <span>Legal & Compliance</span>
+          <span>Draft, subject to legal review</span>
         </div>
         <h1 class="header-title">Terms of Service</h1>
         <p class="header-lead">

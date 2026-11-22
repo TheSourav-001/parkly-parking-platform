@@ -7,7 +7,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Navbar from './components/layout/Navbar.vue'
-import Footer from './components/layout/Footer.vue'
+import SiteFooter from './components/layout/SiteFooter.vue'
 import AppSplashScreen from './components/common/AppSplashScreen.vue'
 
 const route = useRoute()
@@ -52,7 +52,7 @@ function handleNavigate(targetId) {
       </router-view>
     </main>
 
-    <Footer v-if="!isAuthRoute" />
+    <SiteFooter v-if="!isAuthRoute" />
   </div>
 </template>
 
