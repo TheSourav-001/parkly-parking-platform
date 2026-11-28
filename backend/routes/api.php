@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\StatsAndPricingController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\VehicleTypeController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PhoneVerificationController;
 use Illuminate\Support\Facades\Route;
 
 // Health check
@@ -71,5 +73,15 @@ Route::prefix('v1/auth')->group(function () {
         Route::match(['put', 'patch'], '/profile', [AuthController::class, 'updateProfile']);
         Route::put('/password', [AuthController::class, 'updatePassword']);
         Route::post('/logout', [AuthController::class, 'logout']);
+
+        // Phone OTP Verification
+        Route::middleware('throttle:6,1')->group(function () {
+            Route::post('/phone/send-otp', [PhoneVerificationController::class, 'sendOtp']);
+            Route::post('/phone/verify-otp', [PhoneVerificationController::class, 'verifyOtp']);
+        });
+
+        // Email Verification
+        Route::post('/email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])
+            ->middleware('throttle:6,1');
     });
 });

@@ -149,15 +149,21 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         $emailChanged = $validated['email'] !== $user->email;
+        $newPhone = array_key_exists('phone', $validated) && $validated['phone'] !== ''
+            ? $validated['phone']
+            : null;
+        $phoneChanged = $newPhone !== $user->phone;
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->phone = array_key_exists('phone', $validated) && $validated['phone'] !== ''
-            ? $validated['phone']
-            : null;
+        $user->phone = $newPhone;
 
         if ($emailChanged) {
             $user->email_verified_at = null;
+        }
+
+        if ($phoneChanged) {
+            $user->phone_verified_at = null;
         }
 
         $user->save();
@@ -293,6 +299,7 @@ class AuthController extends Controller
             'is_active' => (bool) $user->is_active,
             'avatar' => $user->avatar,
             'email_verified_at' => $user->email_verified_at?->toISOString(),
+            'phone_verified_at' => $user->phone_verified_at?->toISOString(),
             'created_at' => $user->created_at?->toISOString(),
             'updated_at' => $user->updated_at?->toISOString(),
         ];
