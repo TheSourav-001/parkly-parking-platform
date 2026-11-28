@@ -63,51 +63,6 @@ class PricingRangeController extends Controller
             $results[] = new PricingRangeResource($type);
         }
 
-        // Fallback for clean presentation if DB is empty or unseeded
-        if (empty($results)) {
-            $mockDefaults = [
-                (object)[
-                    'id' => 1,
-                    'name' => 'Car / Sedan',
-                    'slug' => 'car',
-                    'description' => 'Standard cars, sedans and compact hatchbacks.',
-                    'min_hourly_rate' => 40.0,
-                    'max_hourly_rate' => 60.0,
-                    'facility_count' => 12,
-                ],
-                (object)[
-                    'id' => 2,
-                    'name' => 'SUV / 4x4',
-                    'slug' => 'suv',
-                    'description' => 'SUVs, crossovers, 4x4s and full-sized passenger vehicles.',
-                    'min_hourly_rate' => 50.0,
-                    'max_hourly_rate' => 80.0,
-                    'facility_count' => 9,
-                ],
-                (object)[
-                    'id' => 3,
-                    'name' => 'Motorcycle',
-                    'slug' => 'motorcycle',
-                    'description' => 'Standard motorbikes, scooters and two-wheelers.',
-                    'min_hourly_rate' => 15.0,
-                    'max_hourly_rate' => 30.0,
-                    'facility_count' => 14,
-                ],
-                (object)[
-                    'id' => 4,
-                    'name' => 'Others / Light Commercial',
-                    'slug' => 'others',
-                    'description' => 'Vans, microbuses and light commercial vehicles.',
-                    'min_hourly_rate' => 40.0,
-                    'max_hourly_rate' => 70.0,
-                    'facility_count' => 6,
-                ],
-            ];
-            foreach ($mockDefaults as $m) {
-                $results[] = new PricingRangeResource($m);
-            }
-        }
-
         return response()->json([
             'success' => true,
             'data' => $results,

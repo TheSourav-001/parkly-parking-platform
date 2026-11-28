@@ -157,6 +157,12 @@ function checkHash() {
 let jsonLdScript = null
 
 function injectSchema() {
+  // Clean up any existing instance before injecting
+  const existing = document.getElementById('parkly-faq-jsonld')
+  if (existing) {
+    existing.remove()
+  }
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -171,6 +177,7 @@ function injectSchema() {
   }
 
   jsonLdScript = document.createElement('script')
+  jsonLdScript.id = 'parkly-faq-jsonld'
   jsonLdScript.type = 'application/ld+json'
   jsonLdScript.text = JSON.stringify(schema)
   document.head.appendChild(jsonLdScript)
@@ -183,9 +190,17 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('hashchange', checkHash)
-  if (jsonLdScript && jsonLdScript.parentNode) {
-    jsonLdScript.parentNode.removeChild(jsonLdScript.parentNode)
+  try {
+    window.removeEventListener('hashchange', checkHash)
+    if (jsonLdScript) {
+      jsonLdScript.remove()
+      jsonLdScript = null
+    } else {
+      const existing = document.getElementById('parkly-faq-jsonld')
+      if (existing) existing.remove()
+    }
+  } catch (err) {
+    console.warn('[FaqSection] Cleanup caught:', err)
   }
 })
 </script>
@@ -205,7 +220,7 @@ onBeforeUnmount(() => {
             <h2 class="faq-serif-heading">Questions, answered.</h2>
             <p class="faq-intro-desc">
               The things drivers and operators ask most about Parkly. Still stuck?
-              <a href="mailto:support@parkly.com" class="faq-inline-link">Contact support</a>
+              <router-link to="/contact" class="faq-inline-link">Contact support</router-link>
               and we will help.
             </p>
           </div>

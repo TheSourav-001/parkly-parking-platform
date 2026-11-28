@@ -127,7 +127,14 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  if (ctx) ctx.revert()
+  try {
+    if (ctx) {
+      ctx.revert()
+      ctx = null
+    }
+  } catch (err) {
+    console.warn('[JourneyStory] Cleanup error:', err)
+  }
 })
 
 function scrollToStep(idx) {

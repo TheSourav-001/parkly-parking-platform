@@ -330,7 +330,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (map) {
-    map.remove()
+    try {
+      map.remove()
+    } catch (e) {
+      console.warn('[ParklyMap] Cleanup error:', e)
+    }
     map = null
   }
 })

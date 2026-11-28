@@ -13,6 +13,11 @@ initTheme()
 const app = createApp(App)
 const pinia = createPinia()
 
+// Global error handler to catch component and lifecycle errors
+app.config.errorHandler = (err, instance, info) => {
+  console.error('[Parkly Vue Error Handler]:', err, info)
+}
+
 app.use(pinia)
 app.use(router)
 

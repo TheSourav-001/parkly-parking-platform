@@ -116,20 +116,27 @@ const router = createRouter({
       // Map cross-route and footer aliases to actual section element IDs
       const aliasMap = {
         '#find-parking': '#discovery',
-        '#journey': '#how-it-works',
-        '#pricing': '#featured',
-        '#operators': '#discovery',
-        '#faq': '#how-it-works',
+        '#journey': '#journey',
+        '#how-it-works': '#journey',
+        '#pricing': '#pricing',
+        '#featured': '#pricing',
+        '#operators': '#operators',
+        '#faq': '#faq',
+        '#support': '#faq',
       }
       const targetHash = aliasMap[to.hash] || to.hash
 
       return new Promise((resolve) => {
         // Wait slightly for DOM to settle if navigating between distinct routes
         setTimeout(() => {
-          const el = document.querySelector(targetHash)
-          if (el) {
-            resolve({ el: targetHash, behavior: 'smooth', top: 110 })
-          } else {
+          try {
+            const el = document.querySelector(targetHash)
+            if (el) {
+              resolve({ el: targetHash, behavior: 'smooth', top: 110 })
+            } else {
+              resolve({ top: 0, behavior: 'smooth' })
+            }
+          } catch {
             resolve({ top: 0, behavior: 'smooth' })
           }
         }, 120)
@@ -169,6 +176,20 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach((to) => {
   if (to.meta && to.meta.title) {
     document.title = to.meta.title
+  }
+})
+
+// Recover from failed dynamic chunk loading or route loading errors
+router.onError((error, to) => {
+  console.error('[Parkly Router Error]:', error)
+  if (
+    error?.message?.includes('Failed to fetch dynamically imported module') ||
+    error?.message?.includes('Importing a module script failed')
+  ) {
+    if (!window.__parkly_reloaded__) {
+      window.__parkly_reloaded__ = true
+      window.location.href = to.fullPath
+    }
   }
 })
 

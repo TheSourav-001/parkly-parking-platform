@@ -95,13 +95,41 @@ const activeCardIndex = computed(() => {
   return Math.min(count - 1, Math.floor(scrollProgress.value * count))
 })
 
-onMounted(async () => {
-  await fetchRanges()
+function scrollToCard(idx) {
+  if (!deckSectionRef.value) return
+  const count = vehicleRanges.value.length
+  if (count <= 1) return
 
-  isReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (isReducedMotion.value) return
+  const rect = deckSectionRef.value.getBoundingClientRect()
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  const containerTop = rect.top + scrollTop
+  const containerHeight = deckSectionRef.value.offsetHeight
+  const viewportHeight = window.innerHeight
+  const scrollableDistance = Math.max(0, containerHeight - viewportHeight)
 
-  await nextTick()
+  const targetProgress = idx / Math.max(1, count - 1)
+  const targetY = containerTop + (targetProgress * scrollableDistance)
+
+  window.scrollTo({
+    top: targetY,
+    behavior: 'smooth',
+  })
+}
+
+function handleLoad() {
+  ScrollTrigger.refresh()
+}
+
+function initScrollTrigger() {
+  if (isReducedMotion.value || !deckSectionRef.value || vehicleRanges.value.length === 0) return
+
+  if (ctx) {
+    try {
+      ctx.revert()
+    } catch {
+      // Ignore
+    }
+  }
 
   ctx = gsap.context(() => {
     ScrollTrigger.create({
@@ -115,12 +143,30 @@ onMounted(async () => {
       },
     })
   }, deckSectionRef.value)
+}
 
-  window.addEventListener('load', () => ScrollTrigger.refresh())
+onMounted(async () => {
+  await fetchRanges()
+
+  isReducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (isReducedMotion.value) return
+
+  await nextTick()
+  initScrollTrigger()
+
+  window.addEventListener('load', handleLoad)
 })
 
 onBeforeUnmount(() => {
-  if (ctx) ctx.revert()
+  try {
+    window.removeEventListener('load', handleLoad)
+    if (ctx) {
+      ctx.revert()
+      ctx = null
+    }
+  } catch (err) {
+    console.warn('[VehicleDeck] Cleanup error:', err)
+  }
 })
 </script>
 
@@ -133,10 +179,45 @@ onBeforeUnmount(() => {
         title="Pay only for what you park"
         subtitle="Fees are calculated on the server from each facility's configured rates."
       />
+
+      <!-- Interactive 4-Vehicle Classes Switcher Pills -->
+      <div v-if="vehicleRanges.length > 0" class="vehicle-class-pills" role="tablist" aria-label="Vehicle Classes">
+        <button
+          v-for="(card, idx) in vehicleRanges"
+          :key="card.id || idx"
+          type="button"
+          role="tab"
+          :aria-selected="activeCardIndex === idx"
+          class="class-pill-btn"
+          :class="{ 'is-active': activeCardIndex === idx }"
+          @click="scrollToCard(idx)"
+        >
+          <span class="pill-idx">0{{ idx + 1 }}</span>
+          <span class="pill-name">{{ card.displayName }}</span>
+          <span v-if="card.rate_display" class="pill-rate">{{ card.rate_display }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Rates Loading or Empty State -->
+    <div v-if="isLoading" class="deck-state-card" role="status">
+      <div class="state-spinner" aria-hidden="true"></div>
+      <p class="state-text">Loading operator rates...</p>
+    </div>
+
+    <div v-else-if="vehicleRanges.length === 0" class="deck-state-card" role="status">
+      <span class="state-eyebrow">OPERATOR RATES</span>
+      <h3 class="state-title">Rates not published yet</h3>
+      <p class="state-desc">
+        Hourly rates are configured directly by registered parking operators. Check back shortly or explore available parking locations.
+      </p>
+      <button class="state-retry-btn" @click="fetchRanges">
+        Check for updates
+      </button>
     </div>
 
     <!-- Reduced Motion Vertical Fallback -->
-    <div v-if="isReducedMotion" class="reduced-motion-deck">
+    <div v-else-if="isReducedMotion" class="reduced-motion-deck">
       <div
         v-for="(card, idx) in vehicleRanges"
         :key="card.id || idx"
@@ -173,18 +254,20 @@ onBeforeUnmount(() => {
           />
         </div>
 
-        <!-- Center Bottom Progress Indicator -->
+        <!-- Center Bottom Progress Indicator (Clickable Segments) -->
         <div class="deck-progress-bar" role="tablist" aria-label="Vehicle card pagination">
-          <div
+          <button
             v-for="(card, idx) in vehicleRanges"
             :key="idx"
+            type="button"
             class="progress-segment"
             :class="{ 'is-active': activeCardIndex === idx }"
             :aria-current="activeCardIndex === idx ? 'step' : undefined"
-            :aria-label="card.displayName"
+            :aria-label="`Switch to ${card.displayName}`"
+            @click="scrollToCard(idx)"
           >
             <div class="segment-fill"></div>
-          </div>
+          </button>
         </div>
       </div>
     </div>
@@ -202,9 +285,76 @@ onBeforeUnmount(() => {
 }
 
 .deck-static-header {
-  padding: 80px clamp(24px, 6vw, 96px) 32px;
+  padding: clamp(48px, 6vw, 64px) clamp(24px, 6vw, 96px) 24px;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* Interactive 4-Vehicle Classes Switcher Pills */
+.vehicle-class-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.class-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-surface, #FFFFFF);
+  border: 1.5px solid var(--color-border, #E2E8F0);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+  font-family: var(--font-sans);
+  color: var(--color-text, #0F172A);
+}
+
+:global([data-theme='dark']) .class-pill-btn {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.class-pill-btn:hover {
+  border-color: var(--color-primary, #0F766E);
+  transform: translateY(-1px);
+}
+
+.class-pill-btn.is-active {
+  background: var(--color-primary, #0F766E);
+  border-color: var(--color-primary, #0F766E);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.25);
+}
+
+.pill-idx {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.pill-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.pill-rate {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--color-primary, #0F766E);
+  font-weight: 600;
+}
+
+.class-pill-btn.is-active .pill-rate {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
 }
 
 /* Outer Scroll Height = cards * 100svh + ~20vh dwell */
@@ -271,9 +421,12 @@ onBeforeUnmount(() => {
 
 .progress-segment {
   width: 28px;
-  height: 4px;
+  height: 6px;
   border-radius: 999px;
   background: var(--color-border, #E2E8F0);
+  border: none;
+  padding: 0;
+  cursor: pointer;
   overflow: hidden;
   transition: all var(--transition-fast);
 }
@@ -310,6 +463,89 @@ onBeforeUnmount(() => {
 
   .deck-progress-bar {
     bottom: 16px;
+  }
+}
+
+/* Empty & Loading States */
+.deck-state-card {
+  max-width: 640px;
+  margin: 40px auto 80px;
+  padding: 48px 32px;
+  text-align: center;
+  background: var(--color-surface, #FFFFFF);
+  border: 1px solid var(--color-border, #E2E8F0);
+  border-radius: var(--radius-2xl, 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+:global([data-theme='dark']) .deck-state-card {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.state-eyebrow {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: var(--color-primary, #0F766E);
+  text-transform: uppercase;
+}
+
+.state-title {
+  font-family: var(--font-serif, "Instrument Serif", Georgia, serif);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--color-text, #0F172A);
+  margin: 0;
+}
+
+.state-desc {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-muted, #64748B);
+  max-width: 460px;
+  margin: 0;
+}
+
+.state-retry-btn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background-color: var(--color-primary, #0F766E);
+  border: none;
+  border-radius: var(--radius-pill, 999px);
+  cursor: pointer;
+  transition: opacity var(--transition-fast, 0.15s ease);
+}
+
+.state-retry-btn:hover {
+  opacity: 0.9;
+}
+
+.state-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border, #E2E8F0);
+  border-top-color: var(--color-primary, #0F766E);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.state-text {
+  font-size: 0.9375rem;
+  color: var(--color-muted, #64748B);
+  margin: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

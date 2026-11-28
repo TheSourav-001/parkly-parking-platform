@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Navbar from './components/layout/Navbar.vue'
 import SiteFooter from './components/layout/SiteFooter.vue'
 import AppSplashScreen from './components/common/AppSplashScreen.vue'
+import RouteErrorBoundary from './components/common/RouteErrorBoundary.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -45,11 +46,9 @@ function handleNavigate(targetId) {
     />
 
     <main class="content-container">
-      <router-view v-slot="{ Component }">
-        <transition name="page-fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <RouteErrorBoundary>
+        <router-view />
+      </RouteErrorBoundary>
     </main>
 
     <SiteFooter v-if="!isAuthRoute" />

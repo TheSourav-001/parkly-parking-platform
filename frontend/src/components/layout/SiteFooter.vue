@@ -250,10 +250,13 @@ function navigateToTarget(href) {
     if (router.currentRoute.value.path === '/') {
       const aliasMap = {
         '#find-parking': '#discovery',
-        '#journey': '#how-it-works',
-        '#pricing': '#featured',
-        '#operators': '#discovery',
-        '#faq': '#how-it-works',
+        '#journey': '#journey',
+        '#how-it-works': '#journey',
+        '#pricing': '#pricing',
+        '#featured': '#pricing',
+        '#operators': '#operators',
+        '#faq': '#faq',
+        '#support': '#faq',
       }
       const targetId = (aliasMap[hash] || hash).replace('#', '')
       const el = document.getElementById(targetId)
@@ -344,9 +347,13 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (animationFrameId) cancelAnimationFrame(animationFrameId)
-  if (resizeObserver) resizeObserver.disconnect()
-  if (intersectionObserver) intersectionObserver.disconnect()
+  try {
+    if (animationFrameId) cancelAnimationFrame(animationFrameId)
+    if (resizeObserver) resizeObserver.disconnect()
+    if (intersectionObserver) intersectionObserver.disconnect()
+  } catch (err) {
+    console.warn('[SiteFooter] Cleanup error:', err)
+  }
 })
 </script>
 

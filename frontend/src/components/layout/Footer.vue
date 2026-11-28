@@ -44,10 +44,10 @@ const selectedRegion = ref('Bangladesh (EN)')
         <div class="footer-column">
           <h3 class="column-header">FOR OPERATORS</h3>
           <ul class="column-links">
-            <li><a href="#operators">List Your Facility</a></li>
-            <li><a href="/register">Operator Registration</a></li>
-            <li><a href="/login">Attendant Login</a></li>
-            <li><a href="#support">Verification Support</a></li>
+            <li><router-link to="/operators/enquiry">List Your Facility</router-link></li>
+            <li><router-link to="/register">Operator Registration</router-link></li>
+            <li><router-link to="/login">Attendant Login</router-link></li>
+            <li><a href="#faq">Verification Support</a></li>
           </ul>
         </div>
 
@@ -55,11 +55,10 @@ const selectedRegion = ref('Bangladesh (EN)')
         <div class="footer-column">
           <h3 class="column-header">COMPANY</h3>
           <ul class="column-links">
-            <li><a href="#about">About Parkly</a></li>
-            <li><a href="#careers">Careers</a></li>
-            <li><a href="#press">Press & Media</a></li>
-            <li><a href="#contact">Contact Support</a></li>
-            <li><a href="#security">Security & Trust</a></li>
+            <li><router-link to="/terms">About Parkly</router-link></li>
+            <li><router-link to="/contact">Contact Support</router-link></li>
+            <li><router-link to="/location-and-data-use">Location & Data Use</router-link></li>
+            <li><router-link to="/privacy">Security & Trust</router-link></li>
           </ul>
         </div>
 
@@ -69,8 +68,7 @@ const selectedRegion = ref('Bangladesh (EN)')
           <ul class="column-links">
             <li><router-link to="/privacy">Privacy Policy</router-link></li>
             <li><router-link to="/terms">Terms of Service</router-link></li>
-            <li><a href="#cookies">Cookie Preferences</a></li>
-            <li><router-link to="/terms#cancellation">Cancellation Policy</router-link></li>
+            <li><router-link to="/cancellation-policy">Cancellation Policy</router-link></li>
             <li><a href="#faq">Help Center & FAQ</a></li>
           </ul>
         </div>

@@ -158,13 +158,17 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  if (activeTimeline) {
-    activeTimeline.pause();
-    activeTimeline = null;
-  }
-  if (rippleAnim) {
-    rippleAnim.pause();
-    rippleAnim = null;
+  try {
+    if (activeTimeline) {
+      if (typeof activeTimeline.pause === 'function') activeTimeline.pause();
+      activeTimeline = null;
+    }
+    if (rippleAnim) {
+      if (typeof rippleAnim.pause === 'function') rippleAnim.pause();
+      rippleAnim = null;
+    }
+  } catch (err) {
+    console.warn('[ParkingAuthIllustration] Cleanup error:', err);
   }
 });
 </script>

@@ -507,16 +507,20 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateResponsiveViewBox)
+  try {
+    window.removeEventListener('resize', updateResponsiveViewBox)
 
-  if (mainTimeline && typeof mainTimeline.pause === 'function') {
-    mainTimeline.pause()
+    if (mainTimeline && typeof mainTimeline.pause === 'function') {
+      mainTimeline.pause()
+    }
+    mainTimeline = null
+    ambientAnims.forEach((a) => {
+      if (a && typeof a.pause === 'function') a.pause()
+    })
+    ambientAnims = []
+  } catch (err) {
+    console.warn('[ProfileParkingAnimation] Cleanup error:', err)
   }
-  mainTimeline = null
-  ambientAnims.forEach((a) => {
-    if (a && typeof a.pause === 'function') a.pause()
-  })
-  ambientAnims = []
 })
 </script>
 
