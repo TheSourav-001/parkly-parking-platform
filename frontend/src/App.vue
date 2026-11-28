@@ -14,6 +14,7 @@ const route = useRoute()
 const router = useRouter()
 
 const isAuthRoute = computed(() => Boolean(route.meta && route.meta.isAuth))
+const isProfileRoute = computed(() => route.name === 'profile')
 
 function scrollOrNavigate(targetId) {
   const el = document.getElementById(targetId)
@@ -52,7 +53,7 @@ function handleNavigate(targetId) {
       </router-view>
     </main>
 
-    <SiteFooter v-if="!isAuthRoute" />
+    <SiteFooter v-if="!isAuthRoute && !isProfileRoute" />
   </div>
 </template>
 

@@ -9,17 +9,19 @@ const THEME_STORAGE_KEY = 'parkly-theme-preference'
 
 // Global reactive state shared across all components
 const currentTheme = ref('light')
+const themePreference = ref('system')
 
 function applyTheme(theme) {
   const root = document.documentElement
   let resolvedTheme = theme
 
   if (theme === 'system') {
-    resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    resolvedTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   }
 
   root.setAttribute('data-theme', resolvedTheme)
   currentTheme.value = resolvedTheme
+  themePreference.value = theme
 }
 
 export function useTheme() {
@@ -45,26 +47,23 @@ export function useTheme() {
       // Ignore
     }
 
-    if (saved && (saved === 'light' || saved === 'dark')) {
+    if (saved && (saved === 'light' || saved === 'dark' || saved === 'system')) {
       applyTheme(saved)
     } else {
-      // Detect system preference as default
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-      const initial = prefersDark ? 'dark' : 'light'
-      applyTheme(initial)
+      applyTheme('system')
     }
 
-    // Listen for OS theme changes if user has not explicitly locked light/dark
+    // Listen for OS theme changes if user has system preference
     if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         let currentSaved = null
         try {
           currentSaved = localStorage.getItem(THEME_STORAGE_KEY)
         } catch {
           // Ignore
         }
-        if (!currentSaved) {
-          applyTheme(e.matches ? 'dark' : 'light')
+        if (!currentSaved || currentSaved === 'system') {
+          applyTheme('system')
         }
       })
     }
@@ -72,6 +71,7 @@ export function useTheme() {
 
   return {
     currentTheme,
+    themePreference,
     setTheme,
     toggleTheme,
     initTheme,

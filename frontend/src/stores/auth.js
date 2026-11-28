@@ -145,6 +145,68 @@ export const useAuthStore = defineStore('auth', {
     },
 
     /**
+     * Send Phone OTP verification code.
+     */
+    async sendPhoneOtp(phone = null) {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        await ensureCsrf()
+        const response = await api.post('/api/v1/auth/phone/send-otp', {
+          phone: phone || undefined,
+        })
+        return response.data
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Failed to send verification code.'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * Verify Phone OTP code.
+     */
+    async verifyPhoneOtp(code) {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        await ensureCsrf()
+        const response = await api.post('/api/v1/auth/phone/verify-otp', { code })
+        if (response.data?.data?.user) {
+          this.user = response.data.data.user
+        }
+        return response.data
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Invalid or expired verification code.'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * Send Email verification notification.
+     */
+    async sendEmailVerification() {
+      this.isLoading = true
+      this.error = null
+
+      try {
+        await ensureCsrf()
+        const response = await api.post('/api/v1/auth/email/verification-notification')
+        return response.data
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Failed to send verification email.'
+        throw err
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
      * Update authenticated user's password.
      */
     async updatePassword(payload) {

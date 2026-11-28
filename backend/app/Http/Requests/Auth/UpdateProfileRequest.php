@@ -33,7 +33,13 @@ class UpdateProfileRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignore($userId),
             ],
-            'phone' => ['nullable', 'string', 'max:20', 'regex:/^([0-9\s\-\+\(\)]*)$/'],
+            'phone' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^([0-9\s\-\+\(\)]*)$/',
+                Rule::unique('users', 'phone')->ignore($userId),
+            ],
         ];
     }
 
